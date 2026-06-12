@@ -64,7 +64,7 @@ complift/
 │   │   │       ├── StatusBar.tsx
 │   │   │       ├── store.ts              # zustand: 当前组件/版本/状态机
 │   │   │       └── tokens.css            # Drafting Bench tokens(#F7F5F0/#21211D/#1E4FD8/#E8743B)
-│   │   └── tests/                        # vitest（镜像 src 结构）
+│   │   └── (测试按 docs/rules TST-3 与源文件同目录共置 `*.test.ts(x)`；本计划各 Task 写的 `tests/...` 路径一律按此换算,如 `src/lib/store/component-store.test.ts`)
 │   └── relay/
 │       ├── package.json                  # bin: complift-relay
 │       ├── tsconfig.json
