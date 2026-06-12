@@ -1,0 +1,11 @@
+{
+  "name": "complift",
+  "private": true,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "packageManager": "pnpm@10.31.0"
+}
