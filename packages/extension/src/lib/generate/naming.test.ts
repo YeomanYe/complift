@@ -36,6 +36,30 @@ describe('inferComponentName', () => {
     expect(inferComponentName(ir)).toBe('Acme');
   });
 
+  it('class 无可用词时优先取 aria-label 首个有意义英文词,先于 pageTitle', () => {
+    const ir = makeIR(
+      el('div', { 'data-original-class': 'px-4', 'aria-label': 'User profile card' }),
+      'Acme Dashboard - Home',
+    );
+    expect(inferComponentName(ir)).toBe('User');
+  });
+
+  it('aria-label 跳过短词与 utility 词', () => {
+    const ir = makeIR(
+      el('div', { 'aria-label': 'Go to flex hero section' }),
+      'Acme Dashboard',
+    );
+    expect(inferComponentName(ir)).toBe('Hero');
+  });
+
+  it('aria-label 无可用英文词时回退到 pageTitle', () => {
+    const ir = makeIR(
+      el('div', { 'aria-label': '关闭' }),
+      'Acme Dashboard',
+    );
+    expect(inferComponentName(ir)).toBe('Acme');
+  });
+
   it('pageTitle 无英文词时回退到根 tag', () => {
     const ir = makeIR(el('section'), '中文标题');
     expect(inferComponentName(ir)).toBe('Section');

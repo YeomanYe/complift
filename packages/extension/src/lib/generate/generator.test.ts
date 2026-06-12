@@ -115,6 +115,24 @@ export default Hero;
     expect(out.tsx).toContain("<div>{'it\\'s {count} <b>'}</div>");
   });
 
+  it('attr 值同含双引号与换行时,表达式形式转义换行,无裸换行进入字符串字面量', () => {
+    const ir = makeIR(el('div', { title: 'line1 "x"\nline2' }));
+    const out = generate(ir, { name: 'Attr' });
+    expect(out.tsx).toContain('title={\'line1 "x"\\nline2\'}');
+    // 生成的每一行都必须是完整行:不存在以未闭合 {' 开头跨行的字符串字面量
+    for (const line of out.tsx.split('\n')) {
+      const opens = line.match(/\{'/g)?.length ?? 0;
+      const closes = line.match(/'\}/g)?.length ?? 0;
+      expect(opens).toBe(closes);
+    }
+  });
+
+  it('attr 值含 \\r\\n 时按先反斜杠后换行的顺序转义', () => {
+    const ir = makeIR(el('div', { title: 'a"b\\c\r\nd' }));
+    const out = generate(ir, { name: 'Attr' });
+    expect(out.tsx).toContain('title={\'a"b\\\\c\\r\\nd\'}');
+  });
+
   it('纯空白文本丢弃,连续空白 collapse 为单空格', () => {
     const ir = makeIR(
       el('div', {}, {}, [

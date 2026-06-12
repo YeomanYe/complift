@@ -148,7 +148,11 @@ function renderText(text: string): string {
 
 function renderAttrValue(name: string, value: string): string {
   if (value.includes('"')) {
-    const escaped = value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const escaped = value
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\r/g, '\\r')
+      .replace(/\n/g, '\\n');
     return `${name}={'${escaped}'}`;
   }
   return `${name}="${value}"`;

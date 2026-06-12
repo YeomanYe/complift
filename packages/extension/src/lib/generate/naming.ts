@@ -38,7 +38,8 @@ function isMeaningfulClassToken(token: string): boolean {
 
 /**
  * 推断组件名:根节点 data-original-class 首个有意义词
- * > pageTitle 首个英文词 > 根 tag;兜底 ClonedComponent。
+ * > aria-label 首个有意义英文词 > pageTitle 首个英文词 > 根 tag;
+ * 兜底 ClonedComponent。
  */
 export function inferComponentName(ir: CaptureIR): string {
   const originalClass = ir.root.attrs['data-original-class'] ?? '';
@@ -46,7 +47,11 @@ export function inferComponentName(ir: CaptureIR): string {
     .split(/\s+/)
     .filter(Boolean)
     .find(isMeaningfulClassToken);
+  const ariaLabel = ir.root.attrs['aria-label'] ?? '';
+  const ariaWord = (ariaLabel.match(/[A-Za-z]+/g) ?? []).find(
+    isMeaningfulClassToken,
+  );
   const titleWord = ir.pageTitle.match(/[A-Za-z]{3,}/)?.[0];
-  const candidate = classToken ?? titleWord ?? ir.root.tag;
+  const candidate = classToken ?? ariaWord ?? titleWord ?? ir.root.tag;
   return pascalCase(candidate) || 'ClonedComponent';
 }
