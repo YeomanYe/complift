@@ -77,8 +77,15 @@ export function createComponentStore(dbName = 'complift'): ComponentStore {
     author: ComponentVersion['author'],
     message: string,
   ): Promise<ComponentVersion> {
-    const component = await getComponent(componentId);
-    const head = await getVersion(component.headVersionId);
+    // 读与写必须在同一个 readwrite 事务内,否则并发 addVersion 会
+    // read-modify-write race 出重复 seq(IDB 同 scope 的 readwrite 事务串行执行)
+    const tx = (await db()).transaction(['components', 'versions'], 'readwrite');
+    const components = tx.objectStore('components');
+    const versions = tx.objectStore('versions');
+    const component = await components.get(componentId);
+    if (!component) throw new Error(`Component not found: ${componentId}`);
+    const head = await versions.get(component.headVersionId);
+    if (!head) throw new Error(`Version not found: ${component.headVersionId}`);
     const version: ComponentVersion = {
       id: crypto.randomUUID(),
       componentId,
@@ -89,11 +96,8 @@ export function createComponentStore(dbName = 'complift'): ComponentStore {
       createdAt: Date.now(),
       files: { tsx: files.tsx, css: files.css },
     };
-    const tx = (await db()).transaction(['components', 'versions'], 'readwrite');
-    await tx.objectStore('versions').put(version);
-    await tx
-      .objectStore('components')
-      .put({ ...component, headVersionId: version.id });
+    await versions.put(version);
+    await components.put({ ...component, headVersionId: version.id });
     await tx.done;
     return version;
   }

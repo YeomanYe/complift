@@ -143,6 +143,23 @@ describe('createComponentStore', () => {
     expect((await store.get(b.component.id)).id).toBe(b.component.id);
   });
 
+  it('concurrent addVersion calls serialize: seqs are exactly 2 and 3, head points at seq=3', async () => {
+    const store = freshStore();
+    const { component } = await store.createFromCapture(meta, files);
+
+    const [a, b] = await Promise.all([
+      store.addVersion(component.id, files, 'manual', 'first'),
+      store.addVersion(component.id, files, 'agent', 'second'),
+    ]);
+
+    expect([a.seq, b.seq].sort((x, y) => x - y)).toEqual([2, 3]);
+    const v3 = a.seq === 3 ? a : b;
+    const updated = await store.get(component.id);
+    expect(updated.headVersionId).toBe(v3.id);
+    const hist = await store.history(component.id);
+    expect(hist.map((v) => v.seq)).toEqual([1, 2, 3]);
+  });
+
   it('addVersion throws for unknown component id', async () => {
     const store = freshStore();
     await expect(

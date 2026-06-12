@@ -147,7 +147,8 @@ function renderText(text: string): string {
 }
 
 function renderAttrValue(name: string, value: string): string {
-  if (value.includes('"')) {
+  // 含双引号或换行都走 {'…'} 表达式形式,保证 printer 输出的每一行都是完整单行
+  if (value.includes('"') || /[\r\n]/.test(value)) {
     const escaped = value
       .replace(/\\/g, '\\\\')
       .replace(/'/g, "\\'")
@@ -215,9 +216,20 @@ function renderNode(
   }
   const childPad = ' '.repeat(ROOT_INDENT + (depth + 1) * INDENT_STEP);
   const lines: string[] = [open];
-  for (const kid of kids) {
+  for (let i = 0; i < kids.length; i += 1) {
+    const kid = kids[i] as IRNode | string;
     if (typeof kid === 'string') {
+      // JSX 会 trim 多行文本的行首/行尾空白:边界空白若与元素兄弟相邻,
+      // 必须显式发出 {' '},否则 React 渲染时空格丢失("Hello link" → "Hellolink")
+      const prev = kids[i - 1];
+      const next = kids[i + 1];
+      if (kid.startsWith(' ') && prev !== undefined && typeof prev !== 'string') {
+        lines.push(`${childPad}{' '}`);
+      }
       lines.push(`${childPad}${renderText(kid.trim())}`);
+      if (kid.endsWith(' ') && next !== undefined && typeof next !== 'string') {
+        lines.push(`${childPad}{' '}`);
+      }
     } else {
       lines.push(...renderNode(kid, depth + 1, classOf));
     }

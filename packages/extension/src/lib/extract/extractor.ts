@@ -19,6 +19,7 @@ const DROP_TAGS = new Set([
   'meta',
   'template',
 ]);
+// TODO: srcset 与 video/audio 的 src 尚未绝对化（后续任务）
 const URL_ATTRS: Record<string, readonly string[]> = {
   img: ['src'],
   a: ['href'],
@@ -87,6 +88,7 @@ function buildNode(
     if (child.nodeType !== ELEMENT_NODE) continue; // 注释等一律丢弃
     const childEl = child as Element; // nodeType === ELEMENT_NODE 已保证，TS 推不出 Node→Element
     const childTag = childEl.tagName.toLowerCase();
+    // DROP_TAGS 在 svg 子树内同样生效:intentional(security),svg 里嵌的 script 等照丢
     if (DROP_TAGS.has(childTag)) continue;
     if (state.count >= state.maxNodes) {
       truncated = true;
@@ -99,10 +101,14 @@ function buildNode(
   return { tag, attrs, styles, children };
 }
 
-/** svg 子树：attrs 原样保留，不做清洗 */
+/** svg 子树：attrs 基本原样保留（class 等不改名），但 on* 与 style 仍丢弃（security） */
 function rawAttrs(el: Element): Record<string, string> {
   const attrs: Record<string, string> = {};
-  for (const attr of Array.from(el.attributes)) attrs[attr.name] = attr.value;
+  for (const attr of Array.from(el.attributes)) {
+    const name = attr.name.toLowerCase();
+    if (name.startsWith('on') || name === 'style') continue;
+    attrs[attr.name] = attr.value;
+  }
   return attrs;
 }
 

@@ -88,6 +88,20 @@ describe('extractElement — 子节点结构', () => {
     expect(t2).toEqual({ text: 'after' });
   });
 
+  it('svg 子树仍丢弃 on* 与 style 属性（class 等其余原样保留）', () => {
+    const el = mount(
+      '<div><svg onclick="alert(1)" style="color:red" class="icon"><path d="M0 0h10" onmouseover="x()"/></svg></div>',
+    );
+    const ir = extractElement(el);
+    const svg = ir.root.children.filter(isNode)[0];
+    expect(svg?.attrs['onclick']).toBeUndefined();
+    expect(svg?.attrs['style']).toBeUndefined();
+    expect(svg?.attrs['class']).toBe('icon');
+    const path = svg?.children.filter(isNode)[0];
+    expect(path?.attrs['onmouseover']).toBeUndefined();
+    expect(path?.attrs['d']).toBe('M0 0h10');
+  });
+
   it('svg 子树原样保留：attrs 不清洗、styles 为空对象', () => {
     const el = mount(
       '<div><svg viewBox="0 0 10 10" class="icon"><path d="M0 0h10" fill="currentColor"/></svg></div>',

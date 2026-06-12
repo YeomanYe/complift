@@ -145,6 +145,47 @@ export default Hero;
     expect(out.tsx).toContain('<p>Hi there</p>');
   });
 
+  it('混合 text+element 子节点的边界空格以 {\' \'} 发出,不被 JSX 行 trim 吃掉', () => {
+    const ir = makeIR(
+      el('p', {}, {}, [
+        { text: 'Hello ' },
+        el('a', { href: 'https://example.com/' }, {}, [{ text: 'link' }]),
+        { text: ' end' },
+      ]),
+    );
+    const out = generate(ir, { name: 'Para' });
+    expect(out.tsx).toContain(`    <p>
+      Hello
+      {' '}
+      <a href="https://example.com/">link</a>
+      {' '}
+      end
+    </p>`);
+    // 任何文本行都不允许依赖行内首尾空格承载语义空白
+    for (const line of out.tsx.split('\n')) {
+      expect(line).toBe(line.trimEnd());
+    }
+  });
+
+  it('text 与 element 边界无空格时不发出 {\' \'}', () => {
+    const ir = makeIR(
+      el('p', {}, {}, [{ text: 'Hello' }, el('b', {}, {}, [{ text: 'x' }])]),
+    );
+    const out = generate(ir, { name: 'Para' });
+    expect(out.tsx).not.toContain("{' '}");
+  });
+
+  it('attr 值仅含换行(无双引号)时也走表达式形式转义,不产生跨行字面量', () => {
+    const ir = makeIR(el('div', { title: 'line1\nline2' }));
+    const out = generate(ir, { name: 'Attr' });
+    expect(out.tsx).toContain("title={'line1\\nline2'}");
+    for (const line of out.tsx.split('\n')) {
+      const opens = line.match(/\{'/g)?.length ?? 0;
+      const closes = line.match(/'\}/g)?.length ?? 0;
+      expect(opens).toBe(closes);
+    }
+  });
+
   it('同一 IR 调用两次输出完全一致(确定性)', () => {
     const ir = makeIR(
       el('div', { 'data-original-class': 'hero' }, { margin: '0' }, [
