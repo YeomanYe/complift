@@ -1,7 +1,7 @@
 /**
  * 捕获时记录元素位置的 CSS 选择器：
  * - 有 id 优先 `#id`
- * - 否则从 body 向下逐级 `tag:nth-of-type(n)`（同 tag 前序兄弟计数）
+ * - 否则从 body 向下逐级 `tag:nth-of-type(n)`（同 tag 前序兄弟计数），并以 `body>` 锚定
  */
 export function computeSourceSelector(el: Element): string {
   if (el.id !== '') {
@@ -17,7 +17,9 @@ export function computeSourceSelector(el: Element): string {
     segments.unshift(`${cur.tagName.toLowerCase()}:nth-of-type(${nthOfType(cur)})`);
     cur = cur.parentElement;
   }
-  return segments.length > 0 ? segments.join('>') : 'body';
+  // 锚定 body：未锚定的复合选择器会被 document.querySelector 命中文档里
+  // 更早出现的同形子树（诱饵），导致定位到错误元素
+  return ['body', ...segments].join('>');
 }
 
 function nthOfType(el: Element): number {

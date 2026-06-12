@@ -27,8 +27,13 @@ function truncate(s: string, max = 24): string {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 }
 
+// 模块级唯一活跃 session：重复 startPicker 时整体 dispose 旧 session
+// （只删 host 会泄漏旧 document 监听）
+let activeSession: { dispose(): void } | null = null;
+
 export function startPicker(doc: Document, cb: PickerCallbacks): { dispose(): void } {
-  // 幂等保障：残留旧 host（异常未清理）先移除
+  activeSession?.dispose();
+  // 兜底：activeSession 之外的残留 host（异常路径）也清掉
   doc.getElementById(HOST_ID)?.remove();
 
   const host = doc.createElement('div');
@@ -193,13 +198,16 @@ export function startPicker(doc: Document, cb: PickerCallbacks): { dispose(): vo
     doc.removeEventListener('click', onClick, true);
     doc.removeEventListener('keydown', onKeyDown, true);
     host.remove();
+    if (activeSession === session) activeSession = null;
   }
 
   doc.addEventListener('mousemove', onMouseMove, true);
   doc.addEventListener('click', onClick, true);
   doc.addEventListener('keydown', onKeyDown, true);
 
-  return { dispose };
+  const session = { dispose };
+  activeSession = session;
+  return session;
 }
 
 /** 右上角 toast，2.5s 自动消失；shadow-root 隔离页面样式 */

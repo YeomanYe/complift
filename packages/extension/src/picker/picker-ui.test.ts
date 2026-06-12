@@ -209,10 +209,18 @@ describe('startPicker — 取消与清理', () => {
 
   it('重复 startPicker 时先清掉旧 host，只保留一个', () => {
     mountTarget();
-    startPicker(document, makeCallbacks());
-    const session2 = startPicker(document, makeCallbacks());
+    const cb1 = makeCallbacks();
+    startPicker(document, cb1);
+    const cb2 = makeCallbacks();
+    const session2 = startPicker(document, cb2);
 
     expect(document.querySelectorAll(`#${HOST_ID}`).length).toBe(1);
+
+    // 旧 session 的 document 监听必须已失效：ESC 只触发新 session 的 onCancel
+    pressEscape();
+    expect(cb1.onCancel).not.toHaveBeenCalled();
+    expect(cb2.onCancel).toHaveBeenCalledTimes(1);
+
     session2.dispose();
     expect(host()).toBeNull();
   });
