@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>complift · 方向 1 Panel Native — preview mockup</title>
+<link rel="stylesheet" href="styles.css">
+<!--
+  complift 扩展工作台 preview mockup · slot 1「Panel Native / 面板原生」
+  纯静态视觉稿（非生产代码）。tab 可点击切换（少量内联 JS 仅作演示）。
+  assumptions:
+  - side panel 取典型宽度 400px、高 640px 平铺陈列；真实环境宽度 360–500px 自适应
+  - 详情页以 PricingCard（stripe.com 来源）为当前组件示例
+  - 暗色镜像（跟随浏览器主题的中性深灰）按方向卡属后续工作，本稿仅亮色
+-->
+</head>
+<body>
+<div class="canvas">
+
+  <header class="canvas-head">
+    <h1><span class="mono">complift</span> 工作台 · 方向 1「Panel Native / 面板原生」</h1>
+    <p>DevTools 同族 · Functional Brutalism（安静档）— 高密度单列钻取 master ⇄ detail · 系统字栈零 webfont · 1px 发丝线分区 · 唯一 accent #1A73E8 · 纯视觉 mockup（tab 可点击）</p>
+  </header>
+
+  <!-- ════════════════════ A · 列表 ⇄ 详情（4 tab） ════════════════════ -->
+  <div class="section-label">A · S2 工作台 — 列表页（master）与详情页 4 tab（Preview / Code / History / Compare）</div>
+  <div class="panel-row">
+
+    <!-- A1 · 列表页 normal：高密度文本行，行高 28px，一屏 20+ 行 -->
+    <div class="panel-slot">
+      <div class="slot-label">A1 · 列表 normal（agent connected · 含一条提取中的行）</div>
+      <div class="panel">
+        <div class="statusbar">
+          <span class="app">complift</span>
+          <span class="grow"></span>
+          <span class="extract busy">提取中 1/1</span>
+          <span class="agent on"><span class="dot"></span>agent</span>
+        </div>
+        <div class="filterbar">
+          <a class="cur">本页 <span class="count">3</span></a>
+          <a>全部 <span class="count">14</span></a>
+          <span class="grow"></span>
+          <a class="sort">最近修改 ▾</a>
+        </div>
+        <div class="list">
+          <div class="row busy">
+            <span class="name"><b>HeroBanner</b><span class="src">stripe.com/pricing</span></span>
+            <span class="v">提取中…</span><span class="t">现在</span>
+          </div>
+          <div class="row sel">
+            <span class="name"><b>PricingCard</b><span class="src">stripe.com/pricing</span></span>
+            <span class="v live">v6</span><span class="t">14:32</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>NavBar</b><span class="src">linear.app</span></span>
+            <span class="v">v4</span><span class="t">11:05</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>HeroSection</b><span class="src">vercel.com</span></span>
+            <span class="v">v3</span><span class="t">昨天</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>商品卡片ProductCard</b><span class="src">item.taobao.com</span></span>
+            <span class="v">v2</span><span class="t">昨天</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>DataTable</b><span class="src">github.com/trending</span></span>
+            <span class="v">v5</span><span class="t">昨天</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>PrimaryButton</b><span class="src">figma.com</span></span>
+            <span class="v">v1</span><span class="t">上周</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>FooterMega</b><span class="src">apple.com.cn</span></span>
+            <span class="v">v2</span><span class="t">上周</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>LoginForm</b><span class="src">notion.so/login</span></span>
+            <span class="v">v3</span><span class="t">上周</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>StatusBadge</b><span class="src">vercel.com/dashboard</span></span>
+            <span class="v">v1</span><span class="t">上周</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>ConfirmModal</b><span class="src">app.slack.com</span></span>
+            <span class="v">v2</span><span class="t">5月28日</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>SideNav_v2-final</b><span class="src">admin.internal-tools.example.co.jp</span></span>
+            <span class="v">v4</span><span class="t">5月22日</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>营销横幅Banner</b><span class="src">zhihu.com</span></span>
+            <span class="v">v1</span><span class="t">5月19日</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>ChartCard</b><span class="src">grafana.example.io/d/k8s</span></span>
+            <span class="v">v6</span><span class="t">5月12日</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>avatar-stack--compact</b><span class="src">dribbble.com/shots</span></span>
+            <span class="v">v0</span><span class="t">5月8日</span>
+          </div>
+        </div>
+        <div class="listfoot">
+          <span>14 个组件 · 38 个版本</span>
+          <span class="grow"></span>
+          <a>导出全部</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- A2–A5 · 详情页 ×4（同一模板实例化，各停在不同 tab；tab 可点击） -->
+    <div class="panel-slot" data-detail="preview">
+      <div class="slot-label">A2 · 详情 — Preview tab（实时渲染 + 视口切换）</div>
+    </div>
+    <div class="panel-slot" data-detail="code">
+      <div class="slot-label">A3 · 详情 — Code tab（TSX + CSS · 编辑 = 新版本）</div>
+    </div>
+    <div class="panel-slot" data-detail="history">
+      <div class="slot-label">A4 · 详情 — History tab（不可变历史 · agent/manual 混合）</div>
+    </div>
+    <div class="panel-slot" data-detail="compare">
+      <div class="slot-label">A5 · 详情 — Compare tab（覆盖对比 · 透明度 52%）</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ B · 四态 + agent 断连 ════════════════════ -->
+  <div class="section-label">B · 状态覆盖 — empty / loading / error / agent disconnected（一切状态都是"行"，不弹 modal）</div>
+  <div class="panel-row">
+
+    <!-- B1 · empty -->
+    <div class="panel-slot">
+      <div class="slot-label">B1 · empty（首次打开，无任何 clone）</div>
+      <div class="panel short">
+        <div class="statusbar">
+          <span class="app">complift</span>
+          <span class="grow"></span>
+          <span class="agent on"><span class="dot"></span>agent</span>
+        </div>
+        <div class="empty">
+          <div class="l1">还没有 clone 任何组件</div>
+          <div class="l2">点击工具栏图标开始选取 <kbd>⌘⇧K</kbd></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B2 · loading -->
+    <div class="panel-slot">
+      <div class="slot-label">B2 · loading（提取 + 生成中 · 2px 不确定进度条 + 骨架行）</div>
+      <div class="panel short">
+        <div class="statusbar">
+          <span class="app">complift</span>
+          <span class="grow"></span>
+          <span class="extract busy">生成组件中…</span>
+          <span class="agent on"><span class="dot"></span>agent</span>
+        </div>
+        <div class="progress"></div>
+        <div class="filterbar">
+          <a class="cur">本页 <span class="count">—</span></a>
+          <a>全部 <span class="count">14</span></a>
+          <span class="grow"></span>
+        </div>
+        <div class="list">
+          <div class="row-skel"><span class="skel w1"></span><span class="skel w2"></span><span class="skel w3"></span><span class="skel w4"></span></div>
+          <div class="row-skel"><span class="skel w2"></span><span class="skel w1"></span><span class="skel w3"></span><span class="skel w4"></span></div>
+          <div class="row-skel"><span class="skel w1"></span><span class="skel w1"></span><span class="skel w3"></span><span class="skel w4"></span></div>
+          <div class="row-skel"><span class="skel w2"></span><span class="skel w2"></span><span class="skel w3"></span><span class="skel w4"></span></div>
+          <div class="row-skel"><span class="skel w1"></span><span class="skel w2"></span><span class="skel w3"></span><span class="skel w4"></span></div>
+          <div class="row-skel"><span class="skel w2"></span><span class="skel w1"></span><span class="skel w3"></span><span class="skel w4"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B3 · error -->
+    <div class="panel-slot">
+      <div class="slot-label">B3 · error（提取失败 → 红 banner 行 + 重试，列表不受牵连）</div>
+      <div class="panel short">
+        <div class="statusbar">
+          <span class="app">complift</span>
+          <span class="grow"></span>
+          <span class="extract" style="color:var(--err)">提取失败</span>
+          <span class="agent on"><span class="dot"></span>agent</span>
+        </div>
+        <div class="filterbar">
+          <a class="cur">本页 <span class="count">2</span></a>
+          <a>全部 <span class="count">14</span></a>
+          <span class="grow"></span>
+          <a class="sort">最近修改 ▾</a>
+        </div>
+        <div class="list">
+          <div class="row-error">
+            <span class="msg">提取失败 · <span class="mono">CheckoutWidget</span> — 跨域 iframe 内容无法访问</span>
+            <a>重试</a>
+          </div>
+          <div class="row">
+            <span class="name"><b>PricingCard</b><span class="src">stripe.com/pricing</span></span>
+            <span class="v">v6</span><span class="t">14:32</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>NavBar</b><span class="src">linear.app</span></span>
+            <span class="v">v4</span><span class="t">11:05</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>HeroSection</b><span class="src">vercel.com</span></span>
+            <span class="v">v3</span><span class="t">昨天</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>商品卡片ProductCard</b><span class="src">item.taobao.com</span></span>
+            <span class="v">v2</span><span class="t">昨天</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B4 · agent disconnected -->
+    <div class="panel-slot">
+      <div class="slot-label">B4 · agent disconnected（空心灰点 + 提示行，本地 relay 未连接）</div>
+      <div class="panel short">
+        <div class="statusbar">
+          <span class="app">complift</span>
+          <span class="grow"></span>
+          <span class="agent off"><span class="dot off"></span>disconnected</span>
+        </div>
+        <div class="row-hint">
+          <span style="flex:1">本地 relay 未连接 · <span class="mono">127.0.0.1:7320</span></span>
+          <a>查看接入指引</a>
+        </div>
+        <div class="filterbar">
+          <a class="cur">本页 <span class="count">3</span></a>
+          <a>全部 <span class="count">14</span></a>
+          <span class="grow"></span>
+          <a class="sort">最近修改 ▾</a>
+        </div>
+        <div class="list">
+          <div class="row">
+            <span class="name"><b>PricingCard</b><span class="src">stripe.com/pricing</span></span>
+            <span class="v">v6</span><span class="t">14:32</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>NavBar</b><span class="src">linear.app</span></span>
+            <span class="v">v4</span><span class="t">11:05</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>HeroSection</b><span class="src">vercel.com</span></span>
+            <span class="v">v3</span><span class="t">昨天</span>
+          </div>
+          <div class="row">
+            <span class="name"><b>DataTable</b><span class="src">github.com/trending</span></span>
+            <span class="v">v5</span><span class="t">昨天</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- token 速览（handoff 附注，非产品 UI） -->
+  <div class="spec">
+    <div><b>tokens</b><br>spacing 4px 基 · 行高 28px · 状态条 24px · tab 32px</div>
+    <div><b>type</b><br>system-ui 11/12/13/15 · ui-monospace 一切数据值</div>
+    <div>
+      <span class="sw" style="background:#FBFBFB"></span>#FBFBFB bg<br>
+      <span class="sw" style="background:#1A1A1A"></span>#1A1A1A fg<br>
+      <span class="sw" style="background:#E0E0E0"></span>#E0E0E0 line
+    </div>
+    <div>
+      <span class="sw" style="background:#1A73E8"></span>#1A73E8 accent（唯一）<br>
+      <span class="sw" style="background:#D93025"></span>#D93025 error<br>
+      <span class="sw" style="background:#188038"></span>#188038 agent ok
+    </div>
+    <div><b>规则</b><br>直角 0–2px · 无阴影 · 1px 线分区<br>四态做成"行"，不弹 modal · 暗色镜像后续（中性深灰非蓝黑）</div>
+  </div>
+</div>
+
+<!-- ════════ 详情页模板（实例化 4 份，各停一个 tab；tab 真实可点） ════════ -->
+<template id="tpl-detail">
+  <div class="panel">
+    <div class="statusbar">
+      <a class="back">‹</a>
+      <span class="crumb">组件 / <b>PricingCard</b> <span style="font-family:var(--font-mono)">v6</span></span>
+      <span class="grow"></span>
+      <span class="agent on"><span class="dot"></span>agent</span>
+    </div>
+    <div class="tabs">
+      <button data-tab="preview">Preview</button>
+      <button data-tab="code">Code</button>
+      <button data-tab="history">History<span class="badge"></span></button>
+      <button data-tab="compare">Compare</button>
+    </div>
+
+    <!-- Preview -->
+    <div class="tabpane" data-pane="preview">
+      <div class="vpbar">
+        <span class="lab">vw</span>
+        <a>375</a><a class="cur">768</a><a>1024</a><a>1440</a>
+        <span class="grow"></span>
+        <span class="zoom">100%</span>
+      </div>
+      <div class="stage">
+        <div class="pc-root">
+          <div class="pc-plan">Pro</div>
+          <div class="pc-price">$24<span class="pc-period">/mo</span></div>
+          <ul class="pc-features">
+            <li>Unlimited components</li>
+            <li>Version history &amp; rollback</li>
+            <li>Agent access via MCP</li>
+          </ul>
+          <button class="pc-cta">开始使用 Pro</button>
+        </div>
+      </div>
+      <div class="metaline">
+        <span>v6 · 编译 24ms · 248×266px</span>
+        <span class="grow"></span>
+        <a>独立窗口打开 ↗</a>
+      </div>
+    </div>
+
+    <!-- Code -->
+    <div class="tabpane" data-pane="code">
+      <div class="filebar">
+        <a class="cur">PricingCard.tsx</a>
+        <a>PricingCard.css</a>
+        <span class="grow"></span>
+        <span class="ro">编辑 = 新版本</span>
+      </div>
+      <div class="code"><span class="ln">1</span><span class="tk-c">// generated by complift · stripe.com/pricing · v6</span>
+<span class="ln">2</span><span class="tk-k">import</span> <span class="tk-s">"./PricingCard.css"</span>;
+<span class="ln">3</span>
+<span class="ln">4</span><span class="tk-k">type</span> <span class="tk-t">PricingCardProps</span> = {
+<span class="ln">5</span>  <span class="tk-a">plan</span>?: <span class="tk-t">string</span>;
+<span class="ln">6</span>  <span class="tk-a">price</span>?: <span class="tk-t">string</span>;
+<span class="ln">7</span>  <span class="tk-a">period</span>?: <span class="tk-t">string</span>;
+<span class="ln">8</span>  <span class="tk-a">features</span>?: <span class="tk-t">string</span>[];
+<span class="ln">9</span>  <span class="tk-a">onSelect</span>?: () =&gt; <span class="tk-t">void</span>;
+<span class="ln">10</span>};
+<span class="ln">11</span>
+<span class="ln">12</span><span class="tk-k">export function</span> <span class="tk-t">PricingCard</span>({
+<span class="ln">13</span>  <span class="tk-a">plan</span> = <span class="tk-s">"Pro"</span>,
+<span class="ln">14</span>  <span class="tk-a">price</span> = <span class="tk-s">"$24"</span>,
+<span class="ln">15</span>  <span class="tk-a">period</span> = <span class="tk-s">"/mo"</span>,
+<span class="ln">16</span>  <span class="tk-a">features</span> = <span class="tk-t">DEFAULT_FEATURES</span>,
+<span class="ln">17</span>  <span class="tk-a">onSelect</span>,
+<span class="ln">18</span>}: <span class="tk-t">PricingCardProps</span>) {
+<span class="ln">19</span>  <span class="tk-k">return</span> (
+<span class="ln">20</span>    &lt;<span class="tk-t">div</span> <span class="tk-a">className</span>=<span class="tk-s">"pc-root"</span>&gt;
+<span class="ln">21</span>      &lt;<span class="tk-t">div</span> <span class="tk-a">className</span>=<span class="tk-s">"pc-plan"</span>&gt;{plan}&lt;/<span class="tk-t">div</span>&gt;
+<span class="ln">22</span>      &lt;<span class="tk-t">div</span> <span class="tk-a">className</span>=<span class="tk-s">"pc-price"</span>&gt;
+<span class="ln">23</span>        {price}
+<span class="ln">24</span>        &lt;<span class="tk-t">span</span> <span class="tk-a">className</span>=<span class="tk-s">"pc-period"</span>&gt;{period}&lt;/<span class="tk-t">span</span>&gt;
+<span class="ln">25</span>      &lt;/<span class="tk-t">div</span>&gt;
+<span class="ln">26</span>      &lt;<span class="tk-t">ul</span> <span class="tk-a">className</span>=<span class="tk-s">"pc-features"</span>&gt;
+<span class="ln">27</span>        {features.map((f) =&gt; (
+<span class="ln">28</span>          &lt;<span class="tk-t">li</span> <span class="tk-a">key</span>={f}&gt;{f}&lt;/<span class="tk-t">li</span>&gt;
+<span class="ln">29</span>        ))}
+<span class="ln">30</span>      &lt;/<span class="tk-t">ul</span>&gt;
+<span class="ln">31</span>      &lt;<span class="tk-t">button</span> <span class="tk-a">className</span>=<span class="tk-s">"pc-cta"</span> <span class="tk-a">onClick</span>={onSelect}&gt;
+<span class="ln">32</span>        开始使用 Pro
+<span class="ln">33</span>      &lt;/<span class="tk-t">button</span>&gt;
+<span class="ln">34</span>    &lt;/<span class="tk-t">div</span>&gt;
+<span class="ln">35</span>  );
+<span class="ln">36</span>}</div>
+      <div class="metaline">
+        <span>v6 · 142 行 · tsx 36 + css 106</span>
+        <span class="grow"></span>
+        <a>复制</a>
+        <a>导出</a>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="tabpane" data-pane="history">
+      <div class="hist">
+        <div class="hrow cur">
+          <span class="hv">v6</span>
+          <span class="hmsg">调整 padding 与 hover 态，对齐原元素间距</span>
+          <span class="ht">14:32</span>
+          <span class="hsub"><span class="srcb agent">agent</span><span>claude-code</span><span class="add">+12</span><span class="del">−4</span><span class="grow"></span><span style="color:var(--accent)">当前</span></span>
+        </div>
+        <div class="hrow">
+          <span class="hv">v5</span>
+          <span class="hmsg">抽出 DEFAULT_FEATURES 常量，props 全部可选</span>
+          <span class="ht">14:18</span>
+          <span class="hsub"><span class="srcb agent">agent</span><span>claude-code</span><span class="add">+9</span><span class="del">−7</span><span class="grow"></span><a>查看</a><a>回滚</a></span>
+        </div>
+        <div class="hrow">
+          <span class="hv">v4</span>
+          <span class="hmsg">手动微调按钮圆角 6px → 与原站一致</span>
+          <span class="ht">昨天 17:40</span>
+          <span class="hsub"><span class="srcb">manual</span><span>code tab 编辑</span><span class="add">+2</span><span class="del">−2</span><span class="grow"></span></span>
+        </div>
+        <div class="hrow">
+          <span class="hv">v3</span>
+          <span class="hmsg">回滚 → 内容等于 v1（不可变历史，新版本指向旧版）</span>
+          <span class="ht">昨天 16:55</span>
+          <span class="hsub"><span class="srcb">manual</span><span>rollback → v1</span><span class="add">+0</span><span class="del">−0</span><span class="grow"></span></span>
+        </div>
+        <div class="hrow">
+          <span class="hv">v2</span>
+          <span class="hmsg">语义化类名重构（pc-* 前缀），删除内联样式</span>
+          <span class="ht">昨天 16:21</span>
+          <span class="hsub"><span class="srcb agent">agent</span><span>codex</span><span class="add">+38</span><span class="del">−51</span><span class="grow"></span></span>
+        </div>
+        <div class="hrow">
+          <span class="hv">v1</span>
+          <span class="hmsg">初始提取 · outerHTML + computed styles diff</span>
+          <span class="ht">昨天 16:02</span>
+          <span class="hsub"><span class="srcb">capture</span><span>stripe.com/pricing</span><span class="add">+157</span><span class="del">−0</span><span class="grow"></span></span>
+        </div>
+      </div>
+      <div class="metaline">
+        <span>6 个版本 · 回滚不丢历史</span>
+        <span class="grow"></span>
+        <a>对比任意两版</a>
+      </div>
+    </div>
+
+    <!-- Compare -->
+    <div class="tabpane" data-pane="compare">
+      <div class="crow">
+        <span class="lab">覆盖对比</span>
+        <span class="toggle"></span>
+        <span class="val" style="color:var(--ok)">开 · 已叠加到原元素</span>
+      </div>
+      <div class="crow">
+        <span class="lab">模式</span>
+        <span class="seg"><a class="cur">overlay</a><a>side-by-side</a><a>onion</a></span>
+      </div>
+      <div class="crow">
+        <span class="lab">透明度</span>
+        <span class="slider"><span class="track"></span><span class="fill"></span><span class="knob"></span></span>
+        <span class="val">52%</span>
+      </div>
+      <div class="cmp-stage">
+        <span class="tag orig">原元素</span>
+        <span class="tag over">v6 渲染 · 52%</span>
+        <div class="ghost orig">
+          <div class="pc-root">
+            <div class="pc-plan">Pro</div>
+            <div class="pc-price">$24<span class="pc-period">/mo</span></div>
+            <ul class="pc-features"><li>Unlimited components</li><li>Version history &amp; rollback</li><li>Agent access via MCP</li></ul>
+            <button class="pc-cta">开始使用 Pro</button>
+          </div>
+        </div>
+        <div class="ghost over">
+          <div class="pc-root">
+            <div class="pc-plan">Pro</div>
+            <div class="pc-price">$24<span class="pc-period">/mo</span></div>
+            <ul class="pc-features"><li>Unlimited components</li><li>Version history &amp; rollback</li><li>Agent access via MCP</li></ul>
+            <button class="pc-cta">开始使用 Pro</button>
+          </div>
+        </div>
+        <span class="delta">Δy +3px</span>
+      </div>
+      <div class="cmp">
+        <div class="crow"><span class="lab">偏移</span><span class="cmp-stats">Δx <b>0</b> · Δy <b class="bad">+3px</b></span></div>
+        <div class="crow"><span class="lab">尺寸</span><span class="cmp-stats">原 <b>248×266</b> · 渲染 <b>248×263</b></span></div>
+        <div class="crow"><span class="lab">像素差异</span><span class="cmp-stats"><b class="bad">2.4%</b>（主要在按钮下边距）</span></div>
+      </div>
+      <div class="metaline">
+        <span>对比基于 v6 · 原元素快照 16:02</span>
+        <span class="grow"></span>
+        <a>刷新原元素快照</a>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+/* mockup 演示用最小 JS：实例化 4 份详情面板，各停一个 tab；tab 真实可点 */
+(function () {
+  var tpl = document.getElementById("tpl-detail");
+  document.querySelectorAll("[data-detail]").forEach(function (slot) {
+    var node = tpl.content.cloneNode(true);
+    slot.appendChild(node);
+    var panel = slot.querySelector(".panel");
+    function activate(tab) {
+      panel.querySelectorAll(".tabs button").forEach(function (b) {
+        b.classList.toggle("cur", b.dataset.tab === tab);
+      });
+      panel.querySelectorAll(".tabpane").forEach(function (p) {
+        p.classList.toggle("cur", p.dataset.pane === tab);
+      });
+    }
+    activate(slot.dataset.detail);
+    panel.querySelectorAll(".tabs button").forEach(function (b) {
+      b.addEventListener("click", function () { activate(b.dataset.tab); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

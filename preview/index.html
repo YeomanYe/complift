@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>complift · Direction 3 — Drafting Bench · Preview Mockup</title>
+<!--
+  ============================================================
+  complift — Side Panel Workbench · Preview Mockup
+  Direction 3 「Drafting Bench / 制图台」 (工程蓝图 · 视觉对比为 C 位)
+  ============================================================
+  纯静态视觉稿，非生产代码。slot: preview-mockup-3 · 2026-06-12
+
+  ASSUMPTIONS（Junior pass 注记）:
+  - Side panel 宽度按 Chrome 典型 420px 呈现，340–460px 弹性
+  - stage(含胶片条+工具沿) 占面板上部 ~45%，inspector 占余下
+  - 色彩语义：钴蓝 #1E4FD8 = 静态结构（选中/标尺/尺寸标注）
+              安全橙 #E8743B = 变化（agent 活动/diff/error）
+  - IBM Plex 用本地 fallback 字栈，不引外部 CDN
+  - 四态 + agent 两态由顶部 DEMO 控制条切换，亦支持 ?state= query
+  ============================================================
+-->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ======== DEMO 控制条（mockup 演示用，非产品 UI） ======== -->
+<header class="demo-bar">
+  <div class="demo-id">
+    <span class="demo-mark">⌗</span>
+    <span class="demo-title">COMPLIFT · PREVIEW MOCKUP</span>
+    <span class="demo-sub">DIRECTION 3 — DRAFTING BENCH · 制图台</span>
+  </div>
+  <div class="demo-controls">
+    <div class="demo-group" role="group" aria-label="状态切换">
+      <span class="demo-label">STATE</span>
+      <button class="demo-btn is-on" data-set-state="normal">NORMAL</button>
+      <button class="demo-btn" data-set-state="empty">EMPTY</button>
+      <button class="demo-btn" data-set-state="loading">LOADING</button>
+      <button class="demo-btn" data-set-state="error">ERROR</button>
+    </div>
+    <div class="demo-group">
+      <span class="demo-label">AGENT</span>
+      <button class="demo-btn demo-agent is-on" data-set-agent="online">PLOTTER: ONLINE</button>
+      <button class="demo-btn demo-agent" data-set-agent="offline">OFFLINE</button>
+    </div>
+  </div>
+</header>
+
+<main class="bench">
+
+  <!-- 左侧图纸注记（≥1100px 显示） -->
+  <aside class="annos annos-left" aria-hidden="true">
+    <div class="anno"><span class="anno-key">A</span>
+      <div class="anno-body">FILMSTRIP / 组件胶片条<em>横向滚动 · 12+ clones · 点击换片上台</em></div></div>
+    <div class="anno"><span class="anno-key">B</span>
+      <div class="anno-body">STAGE / 制图纸舞台<em>常驻渲染 · 网格 8px 基 · 环绕尺寸刻度</em></div></div>
+    <div class="anno"><span class="anno-key">C</span>
+      <div class="anno-body">COMPARE 工具沿<em>overlay 透明度滑杆 / onion-skin 常驻不入 tab</em></div></div>
+    <div class="anno"><span class="anno-key">D</span>
+      <div class="anno-body">INSPECTOR<em>Code / History 双 tab · 版本时间轴刻度轨</em></div></div>
+  </aside>
+
+  <!-- ======== SIDE PANEL 工作台（产品本体 mockup） ======== -->
+  <section class="panel" id="panel" data-state="normal" data-agent="online" aria-label="complift side panel mockup">
+
+    <!-- 顶部状态条 -->
+    <div class="statusbar">
+      <div class="sb-left">
+        <span class="sb-mark">⌗</span>
+        <span class="sb-name">COMPLIFT</span>
+        <span class="sb-cap sb-cap-ready">CAPTURE: READY</span>
+        <span class="sb-cap sb-cap-loading">CAPTURE: EXTRACTING…</span>
+        <span class="sb-cap sb-cap-error">CAPTURE: FAILED</span>
+        <span class="sb-cap sb-cap-empty">CAPTURE: IDLE</span>
+      </div>
+      <div class="sb-right">
+        <span class="sb-plotter sb-plotter-on"><i class="dot dot-on"></i>PLOTTER: ONLINE</span>
+        <span class="sb-plotter sb-plotter-off"><i class="dot dot-off"></i>PLOTTER: OFFLINE</span>
+      </div>
+    </div>
+
+    <!-- relay 断连通知行 -->
+    <div class="relay-notice">LOCAL RELAY OFFLINE — agent 无法写入 · <a href="#">查看接入指引 →</a></div>
+
+    <!-- 组件胶片条 -->
+    <div class="filmstrip" role="tablist" aria-label="cloned components">
+      <div class="strip-scroll">
+        <button class="clip is-active"><span class="thumb th-pricing"><i></i><i></i><i></i><b></b></span><span class="clip-name">pricing-card</span><span class="clip-meta">stripe.com · v6</span></button>
+        <button class="clip"><span class="thumb th-navbar"><i></i><i></i><i></i></span><span class="clip-name">nav-bar</span><span class="clip-meta">linear.app · v3</span></button>
+        <button class="clip"><span class="thumb th-button"><b></b></span><span class="clip-name">btn-primary</span><span class="clip-meta">github.com · v2</span></button>
+        <button class="clip"><span class="thumb th-hero"><i></i><i></i><b></b></span><span class="clip-name">hero-section</span><span class="clip-meta">vercel.com · v1</span></button>
+        <button class="clip"><span class="thumb th-table"><i></i><i></i><i></i><i></i></span><span class="clip-name">data-table</span><span class="clip-meta">airtable.com · v4</span></button>
+        <button class="clip"><span class="thumb th-form"><i></i><i></i><b></b></span><span class="clip-name">登录表单</span><span class="clip-meta">zhihu.com · v2</span></button>
+        <button class="clip"><span class="thumb th-badge"><b></b></span><span class="clip-name">badge-pill</span><span class="clip-meta">npmjs.com · v1</span></button>
+        <button class="clip"><span class="thumb th-modal"><i></i><b></b></span><span class="clip-name">modal-dialog</span><span class="clip-meta">figma.com · v3</span></button>
+        <button class="clip"><span class="thumb th-sidenav"><i></i><i></i><i></i></span><span class="clip-name">side-nav</span><span class="clip-meta">notion.so · v5</span></button>
+        <button class="clip"><span class="thumb th-chart"><i></i><i></i><i></i></span><span class="clip-name">chart-card</span><span class="clip-meta">grafana.com · v2</span></button>
+        <button class="clip"><span class="thumb th-footer"><i></i><i></i></span><span class="clip-name">footer-links</span><span class="clip-meta">anthropic.com · v1</span></button>
+        <button class="clip"><span class="thumb th-field"><i></i><b></b></span><span class="clip-name">form-field__a11y</span><span class="clip-meta">gov.uk · v0</span></button>
+        <button class="clip"><span class="thumb th-card"><i></i><i></i><b></b></span><span class="clip-name">card-feature</span><span class="clip-meta">ruanyifeng.com · v1</span></button>
+      </div>
+      <div class="strip-empty">NO CLONES YET — 点工具栏 ⌗ 在页面上选取第一个元素</div>
+    </div>
+
+    <!-- ======== STAGE 制图纸舞台 ======== -->
+    <div class="stage">
+      <div class="ruler-corner">px</div>
+      <div class="ruler ruler-x"><span style="left:0">0</span><span style="left:80px">80</span><span style="left:160px">160</span><span style="left:240px">240</span><span style="left:320px">320</span><span style="left:400px">400</span></div>
+      <div class="ruler ruler-y"><span style="top:0">0</span><span style="top:80px">80</span><span style="top:160px">160</span><span style="top:240px">240</span></div>
+
+      <div class="stage-canvas">
+
+        <!-- agent 走针描边（online + normal 时可见） -->
+        <svg class="plot-ring" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 100">
+          <rect x="0.5" y="0.5" width="99" height="99" pathLength="100"></rect>
+        </svg>
+
+        <!-- 被钉在图纸上的组件 + 尺寸标注（normal） -->
+        <div class="measure-rig">
+          <div class="dim dim-w"><span class="dim-label">240</span></div>
+          <div class="dim dim-h"><span class="dim-label">226</span></div>
+          <span class="coord">x:128 · y:96 · 1:1</span>
+          <i class="handle h-tl"></i><i class="handle h-tr"></i><i class="handle h-bl"></i><i class="handle h-br"></i>
+
+          <!-- 原始元素快照 ghost（overlay 对比层） -->
+          <div class="ghost" id="ghost" aria-hidden="true">
+            <div class="pc">
+              <div class="pc-tier">Scale</div>
+              <div class="pc-price">$49<span>/mo</span></div>
+              <ul class="pc-feats"><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li></ul>
+              <button class="pc-cta">Get started</button>
+            </div>
+            <span class="ghost-tag">SOURCE SNAPSHOT</span>
+          </div>
+
+          <!-- 当前版本渲染（v6） -->
+          <div class="render" id="render">
+            <div class="pc">
+              <div class="pc-tier">Scale</div>
+              <div class="pc-price">$49<span>/mo</span></div>
+              <ul class="pc-feats"><li>Unlimited projects</li><li>Advanced analytics</li><li>Priority support</li></ul>
+              <button class="pc-cta">Get started</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EMPTY：虚线裁切框注记 -->
+        <div class="empty-frame">
+          <div class="crop">
+            <i class="ck ck-tl"></i><i class="ck ck-tr"></i><i class="ck ck-bl"></i><i class="ck ck-br"></i>
+            <p class="empty-title">NO COMPONENT ON STAGE</p>
+            <p class="empty-sub">去页面选取一个元素 · <kbd>⌘⇧K</kbd></p>
+          </div>
+          <span class="empty-note">SHEET BLANK — AWAITING FIRST CAPTURE</span>
+        </div>
+
+        <!-- LOADING：扫描线 + 注记 -->
+        <div class="scan-layer">
+          <div class="scanline"></div>
+          <span class="scan-note">EXTRACTING — stripe.com/pricing · outerHTML + computed styles</span>
+        </div>
+
+        <!-- ERROR：安全橙注记卡 -->
+        <div class="error-card" role="alert">
+          <div class="ec-head">EXTRACTION FAILED <span class="ec-code">注记 E-07</span></div>
+          <p class="ec-body">跨域样式表无法读取：<code>cdn.stripe.com/v3/pricing.css</code> 返回 CORS 拒绝，computed-style diff 不完整。</p>
+          <div class="ec-actions"><button class="ec-btn ec-retry">RETRY</button><button class="ec-btn">VIEW RAW HTML</button></div>
+        </div>
+      </div>
+
+      <!-- Compare 工具沿（常驻，不入 tab） -->
+      <div class="toolrail">
+        <button class="tr-toggle is-on" id="overlayToggle">◧ OVERLAY</button>
+        <input type="range" id="opacity" class="tr-slider" min="0" max="100" value="35" aria-label="overlay opacity">
+        <span class="tr-readout" id="opacityVal">48%</span>
+        <button class="tr-toggle" id="onionToggle">◫ ONION</button>
+        <span class="tr-spacer"></span>
+        <button class="tr-toggle tr-window">⤢ WINDOW</button>
+      </div>
+    </div>
+
+    <!-- ======== INSPECTOR ======== -->
+    <div class="inspector">
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" data-tab="code" role="tab">CODE</button>
+        <button class="tab" data-tab="history" role="tab">HISTORY <span class="tab-badge" id="histBadge"></span></button>
+      </div>
+
+      <!-- CODE tab -->
+      <div class="pane pane-code is-active" id="pane-code">
+        <div class="code-head"><span class="code-file">PricingCard.tsx</span><span class="code-meta">v6 · agent pass · 2.4 KB</span></div>
+        <pre class="code"><code><span class="ln">1</span><span class="cm">// PricingCard — lifted from stripe.com/pricing</span>
+<span class="ln">2</span><span class="cm">// complift · deterministic extract · v6</span>
+<span class="ln">3</span><span class="k">import</span> * <span class="k">as</span> React <span class="k">from</span> <span class="s">"react"</span>;
+<span class="ln">4</span><span class="k">import</span> <span class="s">"./PricingCard.css"</span>;
+<span class="ln">5</span>
+<span class="ln">6</span><span class="k">export interface</span> <span class="t">PricingCardProps</span> {
+<span class="ln">7</span>  tier?: <span class="t">string</span>;
+<span class="ln">8</span>  price?: <span class="t">string</span>;
+<span class="ln">9</span>  features?: <span class="t">string</span>[];
+<span class="ln">10</span>  onSelect?: () =&gt; <span class="t">void</span>;
+<span class="ln">11</span>}
+<span class="ln">12</span>
+<span class="ln">13</span><span class="k">export function</span> <span class="fn">PricingCard</span>({
+<span class="ln">14</span>  tier = <span class="s">"Scale"</span>,
+<span class="ln">15</span>  price = <span class="s">"$49"</span>,
+<span class="ln">16</span>  features = <span class="s">["Unlimited projects",</span>
+<span class="ln">17</span><span class="s">    "Advanced analytics", "Priority support"]</span>,
+<span class="ln">18</span>  onSelect,
+<span class="ln">19</span>}: <span class="t">PricingCardProps</span>) {
+<span class="ln">20</span>  <span class="k">return</span> (
+<span class="ln">21</span>    &lt;<span class="t">div</span> className=<span class="s">"cl-pricing-card"</span>&gt;
+<span class="ln">22</span>      &lt;<span class="t">span</span> className=<span class="s">"cl-tier"</span>&gt;{tier}&lt;/<span class="t">span</span>&gt;
+<span class="ln">23</span><span class="diff">      &lt;<span class="t">div</span> className=<span class="s">"cl-price-row"</span>&gt;<i class="dmark">Δ v6</i></span>
+<span class="ln">24</span><span class="diff">        &lt;<span class="t">strong</span>&gt;{price}&lt;/<span class="t">strong</span>&gt;&lt;<span class="t">em</span>&gt;/mo&lt;/<span class="t">em</span>&gt;</span>
+<span class="ln">25</span><span class="diff">      &lt;/<span class="t">div</span>&gt;</span>
+<span class="ln">26</span>      &lt;<span class="t">ul</span> className=<span class="s">"cl-features"</span>&gt;
+<span class="ln">27</span>        {features.map((f) =&gt; &lt;<span class="t">li</span> key={f}&gt;{f}&lt;/<span class="t">li</span>&gt;)}
+<span class="ln">28</span>      &lt;/<span class="t">ul</span>&gt;
+<span class="ln">29</span>      &lt;<span class="t">button</span> className=<span class="s">"cl-cta"</span> onClick={onSelect}&gt;
+<span class="ln">30</span>        Get started
+<span class="ln">31</span>      &lt;/<span class="t">button</span>&gt;
+<span class="ln">32</span>    &lt;/<span class="t">div</span>&gt;
+<span class="ln">33</span>  );
+<span class="ln">34</span>}</code></pre>
+      </div>
+
+      <!-- HISTORY tab：带编号刻度的时间轴轨 -->
+      <div class="pane pane-history" id="pane-history">
+        <ol class="timeline">
+          <li class="tl-item is-head is-agent">
+            <span class="tl-tick">v6</span>
+            <div class="tl-card">
+              <div class="tl-row1"><span class="tl-src src-agent">● AGENT</span><span class="tl-time">2 分钟前</span><span class="tl-diff"><b>+12</b> −4</span></div>
+              <p class="tl-msg">统一 padding 至 8px 网格；阴影改用 design token</p>
+            </div>
+          </li>
+          <li class="tl-item">
+            <span class="tl-tick">v5</span>
+            <div class="tl-card">
+              <div class="tl-row1"><span class="tl-src src-manual">○ MANUAL</span><span class="tl-time">今天 10:32</span><span class="tl-diff"><b>+1</b> −1</span></div>
+              <p class="tl-msg">Code tab 手动改 CTA 文案</p>
+            </div>
+          </li>
+          <li class="tl-item is-agent">
+            <span class="tl-tick">v4</span>
+            <div class="tl-card">
+              <div class="tl-row1"><span class="tl-src src-agent">● AGENT</span><span class="tl-time">昨天 18:05</span><span class="tl-diff"><b>+38</b> −29</span></div>
+              <p class="tl-msg">提取内联样式为 PricingCard.css</p>
+            </div>
+          </li>
+          <li class="tl-item is-rollback">
+            <span class="tl-tick">v3</span>
+            <div class="tl-card">
+              <div class="tl-row1"><span class="tl-src src-rb">↩ ROLLBACK → v1</span><span class="tl-time">昨天 17:40</span></div>
+              <p class="tl-msg">回滚 = 内容等于 v1 的新版本（不可变历史）</p>
+            </div>
+          </li>
+          <li class="tl-item is-agent">
+            <span class="tl-tick">v2</span>
+            <div class="tl-card">
+              <div class="tl-row1"><span class="tl-src src-agent">● AGENT</span><span class="tl-time">上周三 14:18</span><span class="tl-diff"><b>+21</b> −21</span></div>
+              <p class="tl-msg">语义化类名重构（cl-* 前缀）</p>
+            </div>
+          </li>
+          <li class="tl-item is-capture">
+            <span class="tl-tick">v1</span>
+            <div class="tl-card">
+              <div class="tl-row1"><span class="tl-src src-cap">◉ CAPTURE</span><span class="tl-time">5 月 11 日</span><span class="tl-diff">214 行</span></div>
+              <p class="tl-msg">初始提取 · stripe.com/pricing · depth 3</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <!-- inspector 的 empty / loading 态 -->
+      <div class="pane-empty">SHEET INDEX EMPTY — 选取元素后，代码与版本史在此呈现</div>
+      <div class="pane-loading">
+        <div class="sk sk-1"></div><div class="sk sk-2"></div><div class="sk sk-3"></div>
+        <div class="sk sk-4"></div><div class="sk sk-5"></div>
+      </div>
+    </div>
+
+    <!-- 面板脚注 -->
+    <div class="panel-foot">
+      <span class="pf-info">PricingCard.tsx · v6 · TSX+CSS</span>
+      <span class="pf-actions"><a href="#">COPY TSX</a><a href="#">EXPORT</a></span>
+    </div>
+  </section>
+
+  <!-- 右侧图纸注记（≥1100px 显示） -->
+  <aside class="annos annos-right" aria-hidden="true">
+    <div class="anno">
+      <div class="anno-body">COLOR SEMANTICS<em><i class="sw sw-blue"></i>钴蓝 #1E4FD8 — 静态结构（选中/标尺/标注）</em><em><i class="sw sw-orange"></i>安全橙 #E8743B — 变化（agent/diff/error）</em></div></div>
+    <div class="anno">
+      <div class="anno-body">TYPE SPEC<em>IBM Plex Sans — UI/标注</em><em>IBM Plex Mono — 代码/坐标/尺寸值</em><em>注记 11px 全大写 +0.14em 字距</em></div></div>
+    <div class="anno">
+      <div class="anno-body">TOKEN 起点<em>纸白 #F7F5F0 · 网格 #E8E4D9 · 墨 #21211D</em><em>网格 8px 基 · 注记字号单独成档</em></div></div>
+  </aside>
+</main>
+
+<!-- 图签 title block -->
+<footer class="titleblock" aria-hidden="true">
+  <span><b>PROJECT</b>COMPLIFT — COMPONENT LIFT WORKBENCH</span>
+  <span><b>SHEET</b>PREVIEW-MOCKUP · 3/3</span>
+  <span><b>DIRECTION</b>DRAFTING BENCH / 制图台</span>
+  <span><b>SCALE</b>1:1</span>
+  <span><b>DATE</b>2026-06-12</span>
+</footer>
+
+<script>
+/* mockup 演示控制（非生产代码） */
+(function () {
+  var panel = document.getElementById('panel');
+
+  /* 状态切换：demo 控制条 + ?state= 双通道 */
+  function setState(s) {
+    panel.dataset.state = s;
+    document.querySelectorAll('[data-set-state]').forEach(function (b) {
+      b.classList.toggle('is-on', b.dataset.setState === s);
+    });
+  }
+  function setAgent(a) {
+    panel.dataset.agent = a;
+    document.querySelectorAll('[data-set-agent]').forEach(function (b) {
+      b.classList.toggle('is-on', b.dataset.setAgent === a);
+    });
+  }
+  document.querySelectorAll('[data-set-state]').forEach(function (b) {
+    b.addEventListener('click', function () { setState(b.dataset.setState); });
+  });
+  document.querySelectorAll('[data-set-agent]').forEach(function (b) {
+    b.addEventListener('click', function () { setAgent(b.dataset.setAgent); });
+  });
+  var q = new URLSearchParams(location.search);
+  if (q.get('state')) setState(q.get('state'));
+  if (q.get('agent')) setAgent(q.get('agent'));
+
+  /* inspector tab 切换 */
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.addEventListener('click', function () {
+      document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('is-active'); });
+      t.classList.add('is-active');
+      document.getElementById('pane-code').classList.toggle('is-active', t.dataset.tab === 'code');
+      document.getElementById('pane-history').classList.toggle('is-active', t.dataset.tab === 'history');
+    });
+  });
+
+  /* Compare 工具沿：overlay / 透明度 / onion-skin */
+  var ghost = document.getElementById('ghost');
+  var slider = document.getElementById('opacity');
+  var readout = document.getElementById('opacityVal');
+  var overlayBtn = document.getElementById('overlayToggle');
+  var onionBtn = document.getElementById('onionToggle');
+  function applyOverlay() {
+    var on = overlayBtn.classList.contains('is-on');
+    ghost.style.opacity = on ? (slider.value / 100) : 0;
+    readout.textContent = slider.value + '%';
+  }
+  slider.addEventListener('input', applyOverlay);
+  overlayBtn.addEventListener('click', function () {
+    overlayBtn.classList.toggle('is-on'); applyOverlay();
+  });
+  onionBtn.addEventListener('click', function () {
+    onionBtn.classList.toggle('is-on');
+    panel.classList.toggle('onion', onionBtn.classList.contains('is-on'));
+  });
+  applyOverlay();
+
+  /* 胶片条选中演示 */
+  document.querySelectorAll('.clip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      document.querySelectorAll('.clip').forEach(function (x) { x.classList.remove('is-active'); });
+      c.classList.add('is-active');
+    });
+  });
+
+  /* agent online 时 History tab 跳橙点 badge（示意） */
+  document.getElementById('histBadge').textContent = '';
+})();
+</script>
+</body>
+</html>

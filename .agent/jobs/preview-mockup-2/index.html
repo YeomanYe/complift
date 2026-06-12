@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>complift · Side Panel 工作台 mockup — 方向 2 Quiet Ops Console</title>
+<!--
+  ============================================================
+  preview-mockup-2 · 纯静态视觉稿（非生产代码）
+  方向卡 slot 2「Quiet Ops Console / 静默操作台」
+  ------------------------------------------------------------
+  Assumptions（Junior pass 假设，已按方向卡 + prep-brief 固化）:
+  - side panel 典型宽度取 420px（brief: 360–500px 区间）
+  - 列表收进 ⌘K 命令面板浮层（方向卡布局策略），13 条 mock 组件
+  - accent #5E6AD2 只出现在: agent 胶囊 / 选中态 / History 紫点 /
+    agent 版本标记 / 唯一主按钮 —— 其余一律中性灰阶
+  - 微光只给 agent 活动（胶囊呼吸 / badge 脉冲），无通用霓虹
+  - 四态用顶部 mockup 控制器切换（debug 条非产品 UI）
+  - 缩略图为 CSS 微缩示意 = "实时渲染快照" 的视觉占位
+  ============================================================
+-->
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ════ mockup 控制器（走查用，非产品 UI）════ -->
+<div class="mock-bar">
+  <span class="mock-bar__title"><strong>complift</strong> · preview-mockup-2 · Quiet Ops Console — 状态控制器</span>
+  <div class="mock-group">
+    <span class="mock-group__label">面板状态</span>
+    <button class="mock-chip is-on" data-set-state="normal">normal</button>
+    <button class="mock-chip" data-set-state="empty">empty</button>
+    <button class="mock-chip" data-set-state="loading">loading</button>
+    <button class="mock-chip" data-set-state="error">error</button>
+  </div>
+  <div class="mock-group">
+    <span class="mock-group__label">agent</span>
+    <button class="mock-chip is-on" data-set-agent="connected">connected</button>
+    <button class="mock-chip" data-set-agent="disconnected">disconnected</button>
+  </div>
+  <div class="mock-group">
+    <button class="mock-chip" id="open-cmdk-btn">打开组件切换器 ⌘K</button>
+  </div>
+</div>
+
+<div class="stage">
+  <p class="stage__caption">
+    S2 · Side Panel 工作台 @ 420px — <b>头部 ⌘K 切换器 + agent 呼吸光胶囊 + 分段控件 4 tab</b><br />
+    深色操作台上唯一的光，属于正在被 agent 改写的组件
+  </p>
+
+  <!-- ════ Side Panel ════ -->
+  <div class="panel" id="panel" data-state="normal" data-agent="connected">
+
+    <!-- 头部：组件切换器 + agent 胶囊 -->
+    <header class="panel-head">
+      <button class="switcher only-normal-error" id="switcher-btn" title="切换组件 (⌘K)">
+        <span class="switcher__mark"></span>
+        <span class="switcher__name">PricingCard</span>
+        <span class="switcher__src">stripe.com</span>
+        <span class="switcher__chev">▾</span>
+        <span class="switcher__kbd">⌘K</span>
+      </button>
+      <div class="alt-head">
+        <span class="switcher__mark"></span>
+        <span class="alt-head__name">complift</span>
+      </div>
+      <div class="agent-capsule">
+        <span class="agent-dot"></span>
+        <span class="agent-capsule__on">Agent</span>
+        <span class="agent-capsule__off">Agent 离线</span>
+      </div>
+    </header>
+
+    <!-- 断连引导行（仅 disconnected）-->
+    <div class="relay-hint">
+      本地 relay 未连接 — <a href="#">查看接入指引 →</a>
+    </div>
+
+    <!-- ════ normal / error 共用主体 ════ -->
+    <div class="seg-wrap only-normal-error">
+      <nav class="seg" role="tablist">
+        <button class="seg__btn is-active" data-tab="preview" role="tab">Preview</button>
+        <button class="seg__btn" data-tab="code" role="tab">Code</button>
+        <button class="seg__btn" data-tab="history" role="tab">
+          History<span class="seg__badge" title="agent 刚写入新版本"></span>
+        </button>
+        <button class="seg__btn" data-tab="compare" role="tab">Compare</button>
+      </nav>
+    </div>
+
+    <div class="tab-body only-normal-error">
+
+      <!-- 嵌入式错误条（仅 error 态）-->
+      <div class="error-bar only-error">
+        <span class="error-bar__icon">!</span>
+        <span class="error-bar__msg">
+          <b>编译失败</b> — esbuild: <code>Unexpected ")" at PricingCard.tsx:41:18</code>。
+          v7 草稿未生效，预览停留在 v6。
+        </span>
+        <button class="error-bar__retry">重试</button>
+      </div>
+
+      <!-- ──── Tab 1 · Preview ──── -->
+      <section class="tab-pane is-active" data-pane="preview">
+        <div class="viewport-row">
+          <div class="vp-seg">
+            <button class="vp-seg__btn">375</button>
+            <button class="vp-seg__btn is-active">768</button>
+            <button class="vp-seg__btn">1024</button>
+            <button class="vp-seg__btn">1440</button>
+            <button class="vp-seg__btn">Fit</button>
+          </div>
+          <span class="vp-meta">v6 · 248 × 318</span>
+        </div>
+        <div class="preview-canvas">
+          <span class="preview-canvas__dims">768 × auto · 100%</span>
+          <!-- mock：被 clone 的组件实时渲染结果 -->
+          <div class="mock-pricing">
+            <span class="mock-pricing__tag">MOST POPULAR</span>
+            <div class="mock-pricing__title">Scale</div>
+            <div class="mock-pricing__price">$49<span> /mo</span></div>
+            <p class="mock-pricing__desc">For growing teams that need usage-based billing and SSO.</p>
+            <ul>
+              <li>Unlimited projects</li>
+              <li>Usage-based invoicing</li>
+              <li>SAML SSO &amp; SCIM</li>
+            </ul>
+            <div class="mock-pricing__cta">Start free trial</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──── Tab 2 · Code ──── -->
+      <section class="tab-pane" data-pane="code">
+        <div class="code-toolbar">
+          <span class="code-file is-active">PricingCard.tsx</span>
+          <span class="code-file">PricingCard.css</span>
+          <div class="code-actions">
+            <button class="ghost-btn">复制</button>
+            <button class="ghost-btn">导出</button>
+          </div>
+        </div>
+        <div class="code-view">
+<pre><span class="code-line"><span class="ln">1</span><span class="tk-cmt">// PricingCard — cloned from stripe.com/pricing · v6</span></span>
+<span class="code-line"><span class="ln">2</span><span class="tk-cmt">// generated by complift · deterministic DOM→React</span></span>
+<span class="code-line"><span class="ln">3</span><span class="tk-kw">import</span><span class="tk-pln"> </span><span class="tk-str">'./PricingCard.css'</span><span class="tk-pln">;</span></span>
+<span class="code-line"><span class="ln">4</span></span>
+<span class="code-line"><span class="ln">5</span><span class="tk-kw">export interface</span><span class="tk-pln"> </span><span class="tk-fn">PricingCardProps</span><span class="tk-pln"> {</span></span>
+<span class="code-line"><span class="ln">6</span><span class="tk-pln">  plan: </span><span class="tk-fn">string</span><span class="tk-pln">;</span></span>
+<span class="code-line"><span class="ln">7</span><span class="tk-pln">  price: </span><span class="tk-fn">number</span><span class="tk-pln">;</span></span>
+<span class="code-line"><span class="ln">8</span><span class="tk-pln">  period?: </span><span class="tk-str">'mo'</span><span class="tk-pln"> | </span><span class="tk-str">'yr'</span><span class="tk-pln">;</span></span>
+<span class="code-line"><span class="ln">9</span><span class="tk-pln">  features: </span><span class="tk-fn">string</span><span class="tk-pln">[];</span></span>
+<span class="code-line"><span class="ln">10</span><span class="tk-pln">  highlighted?: </span><span class="tk-fn">boolean</span><span class="tk-pln">;</span></span>
+<span class="code-line"><span class="ln">11</span><span class="tk-pln">  onSelect?: () =&gt; </span><span class="tk-fn">void</span><span class="tk-pln">;</span></span>
+<span class="code-line"><span class="ln">12</span><span class="tk-pln">}</span></span>
+<span class="code-line"><span class="ln">13</span></span>
+<span class="code-line"><span class="ln">14</span><span class="tk-kw">export function</span><span class="tk-pln"> </span><span class="tk-fn">PricingCard</span><span class="tk-pln">({</span></span>
+<span class="code-line"><span class="ln">15</span><span class="tk-pln">  plan, price, period = </span><span class="tk-str">'mo'</span><span class="tk-pln">,</span></span>
+<span class="code-line"><span class="ln">16</span><span class="tk-pln">  features, highlighted = </span><span class="tk-kw">false</span><span class="tk-pln">, onSelect,</span></span>
+<span class="code-line"><span class="ln">17</span><span class="tk-pln">}: </span><span class="tk-fn">PricingCardProps</span><span class="tk-pln">) {</span></span>
+<span class="code-line"><span class="ln">18</span><span class="tk-pln">  </span><span class="tk-kw">return</span><span class="tk-pln"> (</span></span>
+<span class="code-line"><span class="ln">19</span><span class="tk-pln">    &lt;</span><span class="tk-tag">article</span></span>
+<span class="code-line"><span class="ln">20</span><span class="tk-pln">      </span><span class="tk-att">className</span><span class="tk-pln">={</span><span class="tk-str">`cl-pricing${highlighted ? ' cl-pricing--hot' : ''}`</span><span class="tk-pln">}</span></span>
+<span class="code-line"><span class="ln">21</span><span class="tk-pln">      </span><span class="tk-att">data-clone-src</span><span class="tk-pln">=</span><span class="tk-str">"stripe.com/pricing"</span></span>
+<span class="code-line"><span class="ln">22</span><span class="tk-pln">    &gt;</span></span>
+<span class="code-line is-changed"><span class="ln">23</span><span class="tk-pln">      {highlighted &amp;&amp; (</span></span>
+<span class="code-line is-changed"><span class="ln">24</span><span class="tk-pln">        &lt;</span><span class="tk-tag">span</span><span class="tk-pln"> </span><span class="tk-att">className</span><span class="tk-pln">=</span><span class="tk-str">"cl-pricing__tag"</span><span class="tk-pln">&gt;MOST POPULAR&lt;/</span><span class="tk-tag">span</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line is-changed"><span class="ln">25</span><span class="tk-pln">      )}</span></span>
+<span class="code-line"><span class="ln">26</span><span class="tk-pln">      &lt;</span><span class="tk-tag">h3</span><span class="tk-pln"> </span><span class="tk-att">className</span><span class="tk-pln">=</span><span class="tk-str">"cl-pricing__plan"</span><span class="tk-pln">&gt;{plan}&lt;/</span><span class="tk-tag">h3</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">27</span><span class="tk-pln">      &lt;</span><span class="tk-tag">p</span><span class="tk-pln"> </span><span class="tk-att">className</span><span class="tk-pln">=</span><span class="tk-str">"cl-pricing__price"</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">28</span><span class="tk-pln">        ${price}&lt;</span><span class="tk-tag">small</span><span class="tk-pln">&gt;/{period}&lt;/</span><span class="tk-tag">small</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">29</span><span class="tk-pln">      &lt;/</span><span class="tk-tag">p</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">30</span><span class="tk-pln">      &lt;</span><span class="tk-tag">ul</span><span class="tk-pln"> </span><span class="tk-att">className</span><span class="tk-pln">=</span><span class="tk-str">"cl-pricing__features"</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">31</span><span class="tk-pln">        {features.map((f) =&gt; (</span></span>
+<span class="code-line"><span class="ln">32</span><span class="tk-pln">          &lt;</span><span class="tk-tag">li</span><span class="tk-pln"> </span><span class="tk-att">key</span><span class="tk-pln">={f}&gt;{f}&lt;/</span><span class="tk-tag">li</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">33</span><span class="tk-pln">        ))}</span></span>
+<span class="code-line"><span class="ln">34</span><span class="tk-pln">      &lt;/</span><span class="tk-tag">ul</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line is-changed"><span class="ln">35</span><span class="tk-pln">      &lt;</span><span class="tk-tag">button</span><span class="tk-pln"> </span><span class="tk-att">className</span><span class="tk-pln">=</span><span class="tk-str">"cl-pricing__cta"</span><span class="tk-pln"> </span><span class="tk-att">onClick</span><span class="tk-pln">={onSelect}&gt;</span></span>
+<span class="code-line is-changed"><span class="ln">36</span><span class="tk-pln">        Start free trial</span></span>
+<span class="code-line is-changed"><span class="ln">37</span><span class="tk-pln">      &lt;/</span><span class="tk-tag">button</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">38</span><span class="tk-pln">    &lt;/</span><span class="tk-tag">article</span><span class="tk-pln">&gt;</span></span>
+<span class="code-line"><span class="ln">39</span><span class="tk-pln">  );</span></span>
+<span class="code-line"><span class="ln">40</span><span class="tk-pln">}</span></span>
+</pre>
+        </div>
+        <div class="h-foot">
+          <span>高亮行 = v6（agent）相对 v5 的改动</span>
+          <code>40 行 · TSX</code>
+        </div>
+      </section>
+
+      <!-- ──── Tab 3 · History（不可变历史：回滚 = 新版本指向旧版本）──── -->
+      <section class="tab-pane" data-pane="history">
+        <div class="history-list">
+          <button class="h-item is-current">
+            <span class="h-item__rail"><span class="h-dot h-dot--writing"></span></span>
+            <span class="h-item__head">
+              <span class="h-item__ver">v6</span>
+              <span class="h-item__src h-item__src--agent">agent</span>
+            </span>
+            <span class="h-item__msg">调整 hover 态阴影与过渡曲线，提取 cta 文案为 prop</span>
+            <span class="h-item__meta"><span>2 分钟前</span><span class="h-diff"><span class="add">+12</span> <span class="del">−4</span> · a3f9c1</span></span>
+          </button>
+          <button class="h-item">
+            <span class="h-item__rail"><span class="h-dot h-dot--manual"></span></span>
+            <span class="h-item__head">
+              <span class="h-item__ver">v5</span>
+              <span class="h-item__src">manual</span>
+            </span>
+            <span class="h-item__msg">Code tab 手改：features 列表语义化为 ul/li</span>
+            <span class="h-item__meta"><span>今天 14:02</span><span class="h-diff"><span class="add">+9</span> <span class="del">−11</span> · 7d20e8</span></span>
+          </button>
+          <button class="h-item">
+            <span class="h-item__rail"><span class="h-dot h-dot--agent"></span></span>
+            <span class="h-item__head">
+              <span class="h-item__ver">v4</span>
+              <span class="h-item__src h-item__src--agent">agent</span>
+            </span>
+            <span class="h-item__msg">回滚 → 内容等于 v2（丢弃 v3 的紧凑间距实验）</span>
+            <span class="h-item__meta"><span>昨天 18:47</span><span class="h-diff">rollback · 41b6d0</span></span>
+          </button>
+          <button class="h-item">
+            <span class="h-item__rail"><span class="h-dot h-dot--agent"></span></span>
+            <span class="h-item__head">
+              <span class="h-item__ver">v3</span>
+              <span class="h-item__src h-item__src--agent">agent</span>
+            </span>
+            <span class="h-item__msg">间距压缩为 4px 网格，字号降一档（实验）</span>
+            <span class="h-item__meta"><span>昨天 18:31</span><span class="h-diff"><span class="add">+21</span> <span class="del">−18</span> · c98a47</span></span>
+          </button>
+          <button class="h-item">
+            <span class="h-item__rail"><span class="h-dot h-dot--manual"></span></span>
+            <span class="h-item__head">
+              <span class="h-item__ver">v2</span>
+              <span class="h-item__src">manual</span>
+            </span>
+            <span class="h-item__msg">类名前缀统一为 cl-，去除 stripe 私有 class</span>
+            <span class="h-item__meta"><span>上周三</span><span class="h-diff"><span class="add">+6</span> <span class="del">−6</span> · 5f11b2</span></span>
+          </button>
+          <button class="h-item">
+            <span class="h-item__rail"><span class="h-dot h-dot--system"></span></span>
+            <span class="h-item__head">
+              <span class="h-item__ver">v1</span>
+              <span class="h-item__src">extract</span>
+            </span>
+            <span class="h-item__msg">初始提取 — outerHTML + computed-style diff</span>
+            <span class="h-item__meta"><span>上周三</span><span class="h-diff">186 行 · 0e44aa</span></span>
+          </button>
+        </div>
+        <div class="h-foot">
+          <span>不可变历史 · 回滚会生成新版本</span>
+          <span><code>6 versions</code> · IndexedDB 412 KB</span>
+        </div>
+      </section>
+
+      <!-- ──── Tab 4 · Compare ──── -->
+      <section class="tab-pane" data-pane="compare">
+        <div class="cmp-card">
+          <div class="cmp-row">
+            <div>
+              <div class="cmp-row__label">覆盖对比</div>
+              <div class="cmp-row__sub">把渲染结果叠加在原页面元素上</div>
+            </div>
+            <span class="toggle" role="switch" aria-checked="true"></span>
+          </div>
+          <div class="cmp-row">
+            <div class="cmp-row__label">模式</div>
+            <div class="mode-seg">
+              <button class="mode-seg__btn is-active">Overlay</button>
+              <button class="mode-seg__btn">Onion-skin</button>
+              <button class="mode-seg__btn">Side-by-side</button>
+            </div>
+          </div>
+          <div class="cmp-row">
+            <span class="cmp-row__label">透明度</span>
+            <div class="slider"><span class="slider__fill"></span><span class="slider__knob"></span></div>
+            <span class="slider-val">60%</span>
+          </div>
+        </div>
+        <div class="cmp-stage">
+          <div class="cmp-stage__origin"></div>
+          <div class="cmp-stage__clone"></div>
+          <span class="cmp-stage__tag cmp-stage__tag--a">原元素 · stripe.com</span>
+          <span class="cmp-stage__tag cmp-stage__tag--b">clone v6 · 60%</span>
+          <span class="cmp-stage__delta">Δ 偏移 2px · 字距 −0.2px</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- ════ empty 态：单按钮引导 ════ -->
+    <div class="empty-state only-empty">
+      <h2>还没有 clone 任何组件</h2>
+      <p>去任意页面选取一个元素，complift 会把它变成可预览、可对比、agent 可改写的 React 组件。</p>
+      <button class="primary-btn">选取第一个元素</button>
+      <span class="empty-state__kbd">⌘⇧K 在页面上开始选取</span>
+    </div>
+
+    <!-- ════ loading 态：shimmer 骨架 ════ -->
+    <div class="loading-state only-loading">
+      <div class="sk sk--seg"></div>
+      <div class="sk sk--canvas"></div>
+      <div class="sk sk--line w80"></div>
+      <div class="sk sk--line w60"></div>
+      <div class="sk sk--line w45"></div>
+      <div class="loading-state__hint">正在提取 · computed styles diff…</div>
+    </div>
+
+    <!-- 底部状态条 -->
+    <footer class="panel-foot">
+      <span>
+        <span class="foot-extract foot-extract--ok"><span class="ok">●</span> 提取就绪 · sandbox 编译 184ms</span>
+        <span class="foot-extract foot-extract--loading">◌ 正在提取 · stripe.com/pricing</span>
+        <span class="foot-extract foot-extract--err"><span class="err">●</span> 编译失败 · v7 草稿未生效</span>
+        <span class="foot-extract foot-extract--empty">○ 等待首次选取</span>
+      </span>
+      <span><span class="foot-count--some">13 components</span><span class="foot-count--none">0 components</span> · MCP :7317</span>
+    </footer>
+  </div>
+</div>
+
+<!-- ════ ⌘K 组件命令面板浮层 ════ -->
+<div class="cmdk-backdrop" id="cmdk">
+  <div class="cmdk" role="dialog" aria-label="组件切换器">
+    <div class="cmdk__search">
+      <span class="cmdk__search-icon">⌕</span>
+      <input class="cmdk__input" id="cmdk-input" type="text" placeholder="搜索组件、来源站点…" />
+      <span class="cmdk__esc">esc</span>
+    </div>
+    <div class="cmdk__section">本页 · linear.app</div>
+    <div class="cmdk__list" id="cmdk-list">
+      <button class="cmdk-item">
+        <span class="thumb thumb--navbar"><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">SiteHeader</span>
+        <span class="cmdk-item__src">linear.app · .header__primary-nav--sticky</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">3 versions</span><span>26 分钟前</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--hero"><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">HeroSection</span>
+        <span class="cmdk-item__src">linear.app · section[data-page="home"]</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">1 version</span><span>今天 11:40</span></span>
+      </button>
+      <div class="cmdk__section" style="padding-top:12px">全部组件</div>
+      <button class="cmdk-item is-selected">
+        <span class="thumb thumb--pricing"><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">PricingCard<span class="writing-flag">agent 写入中</span></span>
+        <span class="cmdk-item__src">stripe.com · .PriceCard--highlight</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">6 versions</span><span>2 分钟前</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--button"><i></i></span>
+        <span class="cmdk-item__name">PrimaryButton</span>
+        <span class="cmdk-item__src">vercel.com · button.geist-btn[data-variant]</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">4 versions</span><span>今天 09:18</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--card"><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">文章卡片-推荐位</span>
+        <span class="cmdk-item__src">zhihu.com · .ContentItem.AnswerItem</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">2 versions</span><span>昨天</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--table"><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">UsageTable</span>
+        <span class="cmdk-item__src">github.com · table.js-csv-data</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">5 versions</span><span>昨天</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--form"><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">登录表单</span>
+        <span class="cmdk-item__src">feishu.cn · .login-panel__form-(基础版)</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">2 versions</span><span>上周四</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--sidebar"><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">DocsSidebar</span>
+        <span class="cmdk-item__src">developer.mozilla.org · nav#sidebar-quicklinks</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">0 versions</span><span>上周五</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--chart"><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">StatsChartCard</span>
+        <span class="cmdk-item__src">raycast.com · .MetricCard_root__x7Hq2</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">3 versions</span><span>上周五</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--badge"><i></i><i></i></span>
+        <span class="cmdk-item__name">StatusBadge</span>
+        <span class="cmdk-item__src">tailwindcss.com · span.badge[data-state="ok"]</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">1 version</span><span>上周</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--modal"><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">确认弹窗-双按钮</span>
+        <span class="cmdk-item__src">taobao.com · .next-dialog.J_confirm_2024</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">2 versions</span><span>上月</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--footer"><i></i><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">SiteFooter</span>
+        <span class="cmdk-item__src">anthropic.com · footer.GlobalFooter</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">1 version</span><span>上月</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--avatar"><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">UserChip</span>
+        <span class="cmdk-item__src">figma.com · div[class^="avatar_chip--"]</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">0 versions</span><span>上月</span></span>
+      </button>
+      <button class="cmdk-item">
+        <span class="thumb thumb--toast"><i></i><i></i><i></i></span>
+        <span class="cmdk-item__name">Toast-成功提示</span>
+        <span class="cmdk-item__src">sonner.emilkowal.ski · li[data-sonner-toast]</span>
+        <span class="cmdk-item__meta"><span class="cmdk-item__vers">1 version</span><span>上月</span></span>
+      </button>
+    </div>
+    <div class="cmdk__foot">
+      <span><kbd>↑↓</kbd>选择</span>
+      <span><kbd>↵</kbd>打开</span>
+      <span><kbd>⌘⌫</kbd>删除组件</span>
+      <span style="margin-left:auto">13 个组件</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* mockup 演示控制：tab 切换 / 状态切换 / ⌘K 浮层（非生产代码）*/
+(function () {
+  var panel = document.getElementById('panel');
+
+  /* tab 切换 */
+  var tabs = document.querySelectorAll('.seg__btn');
+  var panes = document.querySelectorAll('.tab-pane');
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      tabs.forEach(function (x) { x.classList.remove('is-active'); });
+      panes.forEach(function (p) { p.classList.remove('is-active'); });
+      t.classList.add('is-active');
+      document.querySelector('[data-pane="' + t.dataset.tab + '"]').classList.add('is-active');
+      if (t.dataset.tab === 'history') {
+        var b = t.querySelector('.seg__badge');
+        if (b) b.remove(); /* 查看后 badge 消除 */
+      }
+    });
+  });
+
+  /* 四态 / agent 两态控制器 */
+  function bindChips(attr, dataKey) {
+    var chips = document.querySelectorAll('[' + attr + ']');
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        chips.forEach(function (x) { x.classList.remove('is-on'); });
+        c.classList.add('is-on');
+        panel.dataset[dataKey] = c.getAttribute(attr);
+      });
+    });
+  }
+  bindChips('data-set-state', 'state');
+  bindChips('data-set-agent', 'agent');
+
+  /* ⌘K 浮层 */
+  var cmdk = document.getElementById('cmdk');
+  var input = document.getElementById('cmdk-input');
+  function openCmdk() { cmdk.classList.add('is-open'); input.value = ''; filter(); input.focus(); }
+  function closeCmdk() { cmdk.classList.remove('is-open'); }
+  document.getElementById('switcher-btn').addEventListener('click', openCmdk);
+  document.getElementById('open-cmdk-btn').addEventListener('click', openCmdk);
+  cmdk.addEventListener('click', function (e) { if (e.target === cmdk) closeCmdk(); });
+  document.addEventListener('keydown', function (e) {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmdk(); }
+    if (e.key === 'Escape') closeCmdk();
+  });
+
+  /* 搜索过滤（演示用） */
+  function filter() {
+    var q = input.value.trim().toLowerCase();
+    document.querySelectorAll('#cmdk-list .cmdk-item').forEach(function (it) {
+      it.style.display = it.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+    });
+  }
+  input.addEventListener('input', filter);
+
+  /* query 通道：?state=error&agent=disconnected&tab=history&cmdk=1 */
+  var qp = new URLSearchParams(location.search);
+  function clickChip(attr, v) {
+    var el = document.querySelector('[' + attr + '="' + v + '"]');
+    if (el) el.click();
+  }
+  if (qp.get('state')) clickChip('data-set-state', qp.get('state'));
+  if (qp.get('agent')) clickChip('data-set-agent', qp.get('agent'));
+  if (qp.get('tab')) {
+    var tb = document.querySelector('.seg__btn[data-tab="' + qp.get('tab') + '"]');
+    if (tb) tb.click();
+  }
+  if (qp.get('cmdk') === '1') openCmdk();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "slot": 2,
+  "style_name": "Quiet Ops Console / 静默操作台（Linear-look 暗色分层 · 组件即主角,中性档）",
+  "layout_strategy": "当前组件优先:列表收进 ⌘K 命令面板浮层（搜索 + 48px 缩略图,13 条 mock 条目）;头部 agent 呼吸光胶囊,分段控件式 4 tab（Preview/Code/History/Compare）,主体整宽给当前内容;agent 写版本时 History tab 紫点 badge 脉冲;empty 单按钮引导 / loading shimmer 骨架 / error 嵌入式柔红条;四态 + agent 两态由页内 mockup 控制器与 ?state=/?agent=/?tab=/?cmdk= query 双通道切换",
+  "component_reuse_plan": "零代码阶段纯视觉占位;Stage 2.3 落地时由 preview/ 入口直接 import src/sidepanel 真实组件,适配器层切 PlatformAdapter;切回 deadline=MVP 第一周",
+  "tokens": {
+    "surface": ["#08090A", "#101113", "#17181C"],
+    "text": ["#EDEDEF", "#8A8F98"],
+    "accent": "#5E6AD2",
+    "semantic": { "ok": "#4CB782", "err": "#EB5757" },
+    "radius": [6, 8],
+    "motion": "120-200ms ease-out",
+    "fonts": "Inter（本地 fallback 字栈）+ JetBrains Mono,数字 tabular-nums"
+  },
+  "screenshots": ["screenshots/375.png", "screenshots/768.png", "screenshots/1024.png", "screenshots/1440.png"],
+  "errors": []
+}

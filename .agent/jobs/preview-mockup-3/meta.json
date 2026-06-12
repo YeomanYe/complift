@@ -1,0 +1,7 @@
+{
+  "slot": 3,
+  "style_name": "Drafting Bench / 制图台（工程蓝图 · 视觉对比为 C 位，大胆档）",
+  "layout_strategy": "stage+inspector 垂直分屏：上 ~45%（状态条+胶片条+网格纸 stage）常驻渲染当前组件，四周尺寸刻度与宽高标注，Compare 透明度滑杆/onion-skin 嵌在 stage 工具沿；下方 inspector 收为 Code/History 两 tab，版本史=带编号刻度的时间轴轨；组件切换=stage 顶横向缩略图胶片条；empty 虚线裁切框注记 / loading 扫描线 / error 橙色注记卡盖在 stage 上",
+  "component_reuse_plan": "零代码阶段纯视觉占位；Stage 2.3 落地时由 preview/ 入口直接 import src/sidepanel 真实组件，适配器层切 PlatformAdapter；切回 deadline=MVP 第一周",
+  "errors": []
+}
