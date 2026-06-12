@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 444 100" width="444" height="100">
+  <!-- complift · direction-3 "Layer Peel" · primary lockup -->
+  <g transform="translate(6,2) scale(0.72)">
+    <g stroke="#21211D" stroke-width="3" stroke-dasharray="6 6" opacity="0.4">
+      <path d="M 28 84 V 46"/>
+      <path d="M 100 84 V 46"/>
+    </g>
+    <g fill="#FFFFFF" fill-opacity="0" stroke="#1E4FD8" stroke-width="7" stroke-linejoin="round">
+      <path d="M 64 84 L 100 102 L 64 120 L 28 102 Z"/>
+      <path d="M 64 66 L 100 84 L 64 102 L 28 84 Z"/>
+    </g>
+    <path d="M 64 10 L 100 28 L 64 46 L 28 28 Z" fill="#E8743B" stroke="#21211D" stroke-width="7" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(110,0)">
+  <!-- wordmark "complift" · hand-built monoline (drafting-pen), no font dependency -->
+  <g fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <!-- comp (ink) -->
+    <g stroke="#21211D">
+      <path d="M 45 36.8 A 20 20 0 1 0 45 63.2"/>
+      <circle cx="78" cy="50" r="20"/>
+      <path d="M 111 70 V 30 M 111 44 A 14 14 0 0 1 139 44 V 70 M 139 44 A 14 14 0 0 1 167 44 V 70"/>
+      <path d="M 180 30 V 92"/>
+      <circle cx="200" cy="50" r="20"/>
+    </g>
+    <!-- lift (cobalt) -->
+    <g stroke="#1E4FD8">
+      <path d="M 233 8 V 70"/>
+      <path d="M 246 30 V 70"/>
+      <path d="M 285 14 A 16 16 0 0 0 269 30 V 70 M 259 32 H 281"/>
+      <path d="M 305 12 V 56 A 14 14 0 0 0 319 70 M 295 32 H 317"/>
+    </g>
+  </g>
+  <circle cx="246" cy="14" r="5.5" fill="#1E4FD8"/>
+  </g>
+</svg>

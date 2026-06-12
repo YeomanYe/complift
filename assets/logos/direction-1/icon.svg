@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- complift · direction-1 "Lift-off" · marquee brackets + component lifted out of its ghost slot -->
+  <rect width="128" height="128" rx="24" fill="#F7F5F0"/>
+  <!-- selection marquee: four corner brackets (cobalt) -->
+  <g fill="none" stroke="#1E4FD8" stroke-width="10" stroke-linecap="square">
+    <path d="M 20 62 V 44 H 38"/>
+    <path d="M 84 108 H 102 V 90"/>
+    <path d="M 20 90 V 108 H 38"/>
+    <path d="M 84 44 H 102 V 62"/>
+  </g>
+  <!-- ghost slot: where the component used to be -->
+  <rect x="38" y="62" width="34" height="34" fill="none" stroke="#21211D" stroke-width="4" stroke-dasharray="7 6" opacity="0.38"/>
+  <!-- the lifted component (safety orange), raised up-right out of the marquee -->
+  <rect x="62" y="14" width="40" height="40" fill="#E8743B"/>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 444 100" width="444" height="100">
+  <!-- complift · direction-1 "Lift-off" · primary lockup -->
+  <g transform="translate(4,-2) scale(0.85)">
+    <g fill="none" stroke="#1E4FD8" stroke-width="10" stroke-linecap="square">
+      <path d="M 20 62 V 44 H 38"/>
+      <path d="M 84 108 H 102 V 90"/>
+      <path d="M 20 90 V 108 H 38"/>
+      <path d="M 84 44 H 102 V 62"/>
+    </g>
+    <rect x="38" y="62" width="34" height="34" fill="none" stroke="#21211D" stroke-width="4" stroke-dasharray="7 6" opacity="0.38"/>
+    <rect x="62" y="14" width="40" height="40" fill="#E8743B"/>
+  </g>
+  <g transform="translate(110,0)">
+  <!-- wordmark "complift" · hand-built monoline (drafting-pen), no font dependency -->
+  <g fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <!-- comp (ink) -->
+    <g stroke="#21211D">
+      <path d="M 45 36.8 A 20 20 0 1 0 45 63.2"/>
+      <circle cx="78" cy="50" r="20"/>
+      <path d="M 111 70 V 30 M 111 44 A 14 14 0 0 1 139 44 V 70 M 139 44 A 14 14 0 0 1 167 44 V 70"/>
+      <path d="M 180 30 V 92"/>
+      <circle cx="200" cy="50" r="20"/>
+    </g>
+    <!-- lift (cobalt) -->
+    <g stroke="#1E4FD8">
+      <path d="M 233 8 V 70"/>
+      <path d="M 246 30 V 70"/>
+      <path d="M 285 14 A 16 16 0 0 0 269 30 V 70 M 259 32 H 281"/>
+      <path d="M 305 12 V 56 A 14 14 0 0 0 319 70 M 295 32 H 317"/>
+    </g>
+  </g>
+  <circle cx="246" cy="14" r="5.5" fill="#1E4FD8"/>
+  </g>
+</svg>
