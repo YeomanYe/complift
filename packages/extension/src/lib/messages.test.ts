@@ -61,6 +61,34 @@ describe('isRpcRequest', () => {
       isRpcRequest({ kind: 'complift:rpc', id: 'req-1', method: 'component:list' }),
     ).toBe(false);
   });
+
+  it('拒绝 method 不在已知集合内的消息', () => {
+    expect(
+      isRpcRequest({ kind: 'complift:rpc', id: 'req-1', method: 'foo:bar', params: {} }),
+    ).toBe(false);
+  });
+
+  it('拒绝 params 为 null 的消息', () => {
+    expect(
+      isRpcRequest({
+        kind: 'complift:rpc',
+        id: 'req-1',
+        method: 'component:list',
+        params: null,
+      }),
+    ).toBe(false);
+  });
+
+  it('拒绝 params 为原始值的消息', () => {
+    expect(
+      isRpcRequest({
+        kind: 'complift:rpc',
+        id: 'req-1',
+        method: 'component:list',
+        params: 42,
+      }),
+    ).toBe(false);
+  });
 });
 
 describe('isBroadcast', () => {

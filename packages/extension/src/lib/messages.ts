@@ -20,6 +20,20 @@ export interface RpcMap {
   'relay:status':       { req: {}; res: { connected: boolean } };
 }
 export type RpcMethod = keyof RpcMap;
+export const RPC_METHODS = [
+  'component:list',
+  'component:get',
+  'component:history',
+  'component:update',
+  'component:rollback',
+  'component:delete',
+  'capture:create',
+  'picker:start',
+  'picker:cancel',
+  'overlay:show',
+  'overlay:hide',
+  'relay:status',
+] as const satisfies readonly RpcMethod[];
 export interface RpcRequest<M extends RpcMethod = RpcMethod> {
   kind: 'complift:rpc'; id: string; method: M; params: RpcMap[M]['req'];
 }
@@ -38,7 +52,8 @@ export const isRpcRequest = (m: unknown): m is RpcRequest => {
   return msg.kind === 'complift:rpc'
     && typeof msg.id === 'string'
     && typeof msg.method === 'string'
-    && msg.params !== undefined;
+    && (RPC_METHODS as readonly string[]).includes(msg.method)
+    && typeof msg.params === 'object' && msg.params !== null;
 };
 export const isBroadcast = (m: unknown): m is BroadcastEvent => {
   if (typeof m !== 'object' || m === null) return false;
