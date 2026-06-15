@@ -71,6 +71,36 @@ export const isRenderSize = (m: unknown): m is RenderSizeMessage => {
     && typeof size.height === 'number';
 };
 
+/**
+ * Run `cb` once the sandbox `iframe` is ready to receive a render request.
+ *
+ * The production sandbox is a chrome-extension sandboxed page rendered in an
+ * opaque cross-origin context: `contentDocument` is `null`/throws until it has
+ * navigated, so we gate the first render on the one-shot `load` event (parity
+ * with overlay.content.ts — avoids relying on the 15s render timeout).
+ *
+ * When the iframe's document IS reachable (a same-origin / stubbed iframe, e.g.
+ * jsdom in tests, where the `load` event may never fire), there is no cross-doc
+ * navigation to await, so `cb` runs synchronously — the stub path never hangs.
+ * Returns a cleanup function that detaches the pending listener.
+ */
+export function whenIframeReady(iframe: HTMLIFrameElement, cb: () => void): () => void {
+  let docReachable = false;
+  try {
+    docReachable = iframe.contentDocument != null;
+  } catch {
+    // SecurityError → genuinely cross-origin sandbox still loading.
+    docReachable = false;
+  }
+  if (docReachable) {
+    cb();
+    return () => {};
+  }
+  const onLoad = (): void => cb();
+  iframe.addEventListener('load', onLoad, { once: true });
+  return () => iframe.removeEventListener('load', onLoad);
+}
+
 export interface SandboxClientOptions {
   /** Render timeout in ms before resolving with `{ ok: false, error: 'timeout' }`. */
   timeoutMs?: number;

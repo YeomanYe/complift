@@ -29,12 +29,25 @@ export interface OverlayHideMessage {
   kind: 'complift:overlay-hide';
 }
 
+const isOverlayPayload = (p: unknown): p is OverlayPayload => {
+  if (typeof p !== 'object' || p === null) return false;
+  const payload = p as Record<string, unknown>;
+  const files = payload.files as Record<string, unknown> | null | undefined;
+  return typeof payload.componentId === 'string'
+    && typeof payload.opacity === 'number'
+    && (payload.mode === 'overlay' || payload.mode === 'difference')
+    && typeof payload.sourceSelector === 'string'
+    && typeof files === 'object' && files !== null
+    && typeof files.tsx === 'string'
+    && typeof files.css === 'string';
+};
+
 export const isOverlayShowMessage = (m: unknown): m is OverlayShowMessage => {
   if (typeof m !== 'object' || m === null) return false;
   const msg = m as Record<string, unknown>;
   return msg.kind === 'complift:overlay-show'
     && typeof msg.sandboxUrl === 'string'
-    && typeof msg.payload === 'object' && msg.payload !== null;
+    && isOverlayPayload(msg.payload);
 };
 
 export const isOverlayHideMessage = (m: unknown): m is OverlayHideMessage => {

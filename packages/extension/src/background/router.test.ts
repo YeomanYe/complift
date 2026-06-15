@@ -249,13 +249,51 @@ describe('createRouter', () => {
   });
 
   it('overlay 线协议 guards 识别 show/hide 消息', () => {
+    const validPayload = {
+      componentId: 'c1',
+      opacity: 0.5,
+      mode: 'overlay' as const,
+      files: { tsx: 'export const A = () => null;', css: '.a{}' },
+      sourceSelector: 'main > div',
+    };
+    // 完整合法消息通过
     expect(
       isOverlayShowMessage({
         kind: 'complift:overlay-show',
         sandboxUrl: '/sandbox.html',
-        payload: { componentId: 'c1' },
+        payload: validPayload,
       }),
     ).toBe(true);
+
+    // 深校验:payload 内部承载字段缺失/错型一律拒绝(不能只靠 payload 是对象)
+    expect(
+      isOverlayShowMessage({
+        kind: 'complift:overlay-show',
+        sandboxUrl: '/sandbox.html',
+        payload: { componentId: 'c1' }, // 缺 files/opacity/mode/sourceSelector
+      }),
+    ).toBe(false);
+    expect(
+      isOverlayShowMessage({
+        kind: 'complift:overlay-show',
+        sandboxUrl: '/sandbox.html',
+        payload: { ...validPayload, files: { tsx: 'x' } }, // 缺 css
+      }),
+    ).toBe(false);
+    expect(
+      isOverlayShowMessage({
+        kind: 'complift:overlay-show',
+        sandboxUrl: '/sandbox.html',
+        payload: { ...validPayload, mode: 'bogus' }, // mode 非法枚举值
+      }),
+    ).toBe(false);
+    expect(
+      isOverlayShowMessage({
+        kind: 'complift:overlay-show',
+        sandboxUrl: '/sandbox.html',
+        payload: { ...validPayload, opacity: '0.5' }, // opacity 错型
+      }),
+    ).toBe(false);
     expect(isOverlayShowMessage({ kind: 'complift:overlay-show' })).toBe(false);
     expect(isOverlayShowMessage({ kind: 'other' })).toBe(false);
 

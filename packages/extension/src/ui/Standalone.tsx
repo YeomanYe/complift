@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createSandboxClient, type SandboxClient } from '../lib/sandbox-protocol';
+import { createSandboxClient, whenIframeReady, type SandboxClient } from '../lib/sandbox-protocol';
 import type { ComponentVersion } from '../lib/types';
 import type { PlatformAdapter } from '../platform/adapter';
 import './standalone.css';
@@ -91,15 +91,27 @@ export function Standalone({
     };
   }, [sandboxFactory]);
 
-  // Render the preview whenever the shown version's files change.
+  // Render the preview whenever the shown version's files change. Gate the first
+  // render on the iframe `load` event (parity with overlay.content.ts), resolving
+  // immediately when the iframe is already loaded so the stubbed path never hangs.
   const tsx = version?.files.tsx ?? '';
   const css = version?.files.css ?? '';
   useEffect(() => {
     const client = clientRef.current;
-    if (client === null || version === null) return;
-    void client.render(tsx, css).then((res) => {
-      if (res.ok && res.size) setFitSize(res.size);
-    });
+    const iframe = iframeRef.current;
+    if (client === null || iframe === null || version === null) return;
+    let cancelled = false;
+    const doRender = (): void => {
+      if (cancelled) return;
+      void client.render(tsx, css).then((res) => {
+        if (!cancelled && res.ok && res.size) setFitSize(res.size);
+      });
+    };
+    const cleanup = whenIframeReady(iframe, doRender);
+    return () => {
+      cancelled = true;
+      cleanup();
+    };
   }, [version, tsx, css]);
 
   const preset = PRESETS.find((p) => p.id === presetId);

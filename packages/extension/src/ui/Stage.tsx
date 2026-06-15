@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SandboxClient } from '../lib/sandbox-protocol';
+import { whenIframeReady, type SandboxClient } from '../lib/sandbox-protocol';
 import { useAdapter, useSandboxFactory, useWorkbench } from './context';
 
 export interface OverlayControls {
@@ -50,14 +50,28 @@ export function Stage(): React.JSX.Element {
   }, [sandboxFactory]);
 
   // Re-render the preview whenever the shown version's files change.
+  // Gate the FIRST render on the iframe `load` event so a not-yet-ready sandbox
+  // doesn't fall back to the 15s render timeout (parity with overlay.content.ts).
+  // Resolves immediately if the iframe is already loaded — keeps the stubbed
+  // sandbox path (tests) from deadlocking.
   const tsx = version?.files.tsx ?? '';
   const css = version?.files.css ?? '';
   useEffect(() => {
     const client = clientRef.current;
-    if (client === null || version === null) return;
-    void client.render(tsx, css).then((res) => {
-      if (res.ok && res.size) setSize(res.size);
-    });
+    const iframe = iframeRef.current;
+    if (client === null || iframe === null || version === null) return;
+    let cancelled = false;
+    const doRender = (): void => {
+      if (cancelled) return;
+      void client.render(tsx, css).then((res) => {
+        if (!cancelled && res.ok && res.size) setSize(res.size);
+      });
+    };
+    const cleanup = whenIframeReady(iframe, doRender);
+    return () => {
+      cancelled = true;
+      cleanup();
+    };
   }, [version, tsx, css]);
 
   // Drive overlay compare through the adapter (no chrome dependency).
