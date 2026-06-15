@@ -22,13 +22,16 @@ export function CodeTab(): React.JSX.Element {
   const [css, setCss] = useState('');
   const [dirty, setDirty] = useState(false);
 
-  // Reset buffers whenever the on-stage version changes.
+  // Reset buffers whenever the on-stage version changes. Versions are immutable,
+  // so the version id is the correct (and only) trigger — keying on file content
+  // too would risk a redundant mid-edit reset.
   const versionId = version?.id ?? null;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setTsx(version?.files.tsx ?? '');
     setCss(version?.files.css ?? '');
     setDirty(false);
-  }, [versionId, version?.files.tsx, version?.files.css]);
+  }, [versionId]);
 
   const nextSeq = version ? version.seq + 1 : 1;
   const readOnly = viewingHistory || version === null;

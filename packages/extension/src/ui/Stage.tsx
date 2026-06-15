@@ -61,16 +61,22 @@ export function Stage(): React.JSX.Element {
   }, [version, tsx, css]);
 
   // Drive overlay compare through the adapter (no chrome dependency).
+  // Skip the hide RPC unless the overlay was actually turned on at some point —
+  // otherwise every mount / component switch would fire a pointless overlay:hide.
+  const overlayWasEnabled = useRef(false);
   useEffect(() => {
     const componentId = version?.componentId;
     if (componentId === undefined) return;
     if (overlay.enabled) {
+      overlayWasEnabled.current = true;
       void adapter.rpc('overlay:show', {
         componentId,
         opacity: overlay.opacity / 100,
         mode: overlay.mode,
       });
-    } else {
+    } else if (overlayWasEnabled.current) {
+      // Only hide if it had previously been enabled (real disable path).
+      overlayWasEnabled.current = false;
       void adapter.rpc('overlay:hide', {});
     }
   }, [adapter, overlay, version?.componentId]);
@@ -140,7 +146,12 @@ export function Stage(): React.JSX.Element {
           ◫ DIFFERENCE
         </button>
         <span className="wb-tr-spacer" />
-        <button type="button" className="wb-tr-toggle wb-tr-window">
+        <button
+          type="button"
+          className="wb-tr-toggle wb-tr-window"
+          disabled
+          title="独立预览窗 (Task 10)"
+        >
           ⤢ OPEN WINDOW
         </button>
       </div>

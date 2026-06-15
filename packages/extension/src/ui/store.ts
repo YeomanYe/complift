@@ -48,8 +48,18 @@ async function loadComponentInto(
   return { component, version, history };
 }
 
-export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> =>
-  create<WorkbenchStore>((set, get) => ({
+export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> => {
+  /**
+   * Monotonic request generation. Every action that fetches-then-sets the
+   * current component/version captures the value before its first await and
+   * re-checks it after; a newer action (faster A→B click, or a
+   * `component:changed` broadcast landing mid-flight) bumps the counter so the
+   * stale response bails out instead of overwriting newer state
+   * (last-action-wins, not last-resolve-wins).
+   */
+  let reqSeq = 0;
+
+  return create<WorkbenchStore>((set, get) => ({
     components: [],
     currentId: null,
     currentVersion: null,
@@ -60,6 +70,7 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
     relayConnected: false,
 
     async load(adapter) {
+      const seq = ++reqSeq;
       set({ state: 'loading', error: null });
       try {
         const [components, relay] = await Promise.all([
@@ -67,6 +78,7 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
           adapter.rpc('relay:status', {}),
         ]);
         if (components.length === 0) {
+          if (seq !== reqSeq) return;
           set({
             components,
             currentId: null,
@@ -80,6 +92,7 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
         }
         const first = components[0]!;
         const loaded = await loadComponentInto(adapter, first.id);
+        if (seq !== reqSeq) return;
         set({
           components,
           currentId: first.id,
@@ -90,14 +103,17 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
           relayConnected: relay.connected,
         });
       } catch (err) {
+        if (seq !== reqSeq) return;
         set({ state: 'error', error: messageOf(err) });
       }
     },
 
     async select(adapter, componentId) {
       if (componentId === get().currentId && !get().viewingHistory) return;
+      const seq = ++reqSeq;
       try {
         const loaded = await loadComponentInto(adapter, componentId);
+        if (seq !== reqSeq) return;
         set({
           currentId: componentId,
           currentVersion: loaded.version,
@@ -107,6 +123,7 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
           error: null,
         });
       } catch (err) {
+        if (seq !== reqSeq) return;
         set({ state: 'error', error: messageOf(err) });
       }
     },
@@ -159,11 +176,28 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
     async refreshCurrent(adapter) {
       const componentId = get().currentId;
       if (componentId === null) return;
+      // Capture whether the user is pinned to an older version BEFORE awaiting:
+      // if so, a broadcast refresh must update the timeline but must NOT yank
+      // them off the version they're inspecting.
+      const wasViewingHistory = get().viewingHistory;
+      const seq = ++reqSeq;
       try {
         const [components, loaded] = await Promise.all([
           adapter.rpc('component:list', {}),
           loadComponentInto(adapter, componentId),
         ]);
+        if (seq !== reqSeq) return;
+        if (wasViewingHistory) {
+          // Pinned on an old version: refresh components + history (the timeline
+          // gains the new entry) but leave currentVersion / viewingHistory pinned.
+          set({
+            components,
+            history: loaded.history,
+            state: 'normal',
+            error: null,
+          });
+          return;
+        }
         set({
           components,
           currentVersion: loaded.version,
@@ -173,6 +207,7 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
           error: null,
         });
       } catch (err) {
+        if (seq !== reqSeq) return;
         set({ state: 'error', error: messageOf(err) });
       }
     },
@@ -181,6 +216,7 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
       set({ relayConnected: connected });
     },
   }));
+};
 
 function messageOf(err: unknown): string {
   return err instanceof Error ? err.message : String(err);

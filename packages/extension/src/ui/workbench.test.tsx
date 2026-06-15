@@ -161,6 +161,102 @@ describe('Workbench — Drafting Bench', () => {
     );
   });
 
+  it('drops a stale slow select response (last-action-wins, not last-resolve-wins)', async () => {
+    // Wrap the mock adapter so the FIRST component:get resolves slower than the
+    // SECOND, simulating a fast A→B click where A's response lands last.
+    const base = createMockAdapter();
+    let getCalls = 0;
+    let releaseSlowGet: (() => void) | null = null;
+    const slowGate = new Promise<void>((resolve) => {
+      releaseSlowGet = resolve;
+    });
+    const adapter: PlatformAdapter = {
+      async rpc(method, params) {
+        if (method === 'component:get') {
+          getCalls += 1;
+          // The first explicit select (call #2 — call #1 is the initial load)
+          // is held until we release it AFTER the second select resolves.
+          if (getCalls === 2) await slowGate;
+        }
+        return base.rpc(method, params);
+      },
+      onEvent: base.onEvent.bind(base),
+      sandboxUrl: base.sandboxUrl.bind(base),
+    };
+
+    renderWorkbench(adapter, sandbox.factory);
+    const clips = await screen.findAllByTestId('filmstrip-clip');
+    await waitFor(() => expect(sandbox.renders.length).toBeGreaterThan(0));
+
+    const initiallySelected = clips.find((c) => c.getAttribute('aria-selected') === 'true')!;
+    const others = clips.filter((c) => c !== initiallySelected);
+    const slowTarget = others[0]!; // select A (held)
+    const fastTarget = others[1]!; // select B (resolves first, should win)
+
+    const fastName = fastTarget.textContent ?? '';
+
+    // Fire A (slow) then B (fast). B resolves while A is still gated.
+    fireEvent.click(slowTarget);
+    fireEvent.click(fastTarget);
+
+    // B (the LAST action) wins the stage.
+    await waitFor(() => expect(fastTarget.getAttribute('aria-selected')).toBe('true'));
+
+    // Now release the stale slow response for A — it must NOT overwrite B.
+    act(() => releaseSlowGet!());
+    await new Promise((r) => setTimeout(r, 0));
+
+    await waitFor(() => expect(fastTarget.getAttribute('aria-selected')).toBe('true'));
+    expect(slowTarget.getAttribute('aria-selected')).not.toBe('true');
+    // Version badge / filmstrip still reflect B, not the stale A.
+    expect(fastTarget.getAttribute('aria-selected')).toBe('true');
+    expect(fastName.length).toBeGreaterThan(0);
+  });
+
+  it('keeps the pinned history version on stage when a broadcast refresh lands', async () => {
+    const base = createMockAdapter();
+    const { adapter, emit } = withBroadcast(base);
+    renderWorkbench(adapter, sandbox.factory);
+
+    // Select NavBar (multi-version) and open its History.
+    const clips = await screen.findAllByTestId('filmstrip-clip');
+    const navClip = clips.find((c) => /navbar/i.test(c.textContent ?? ''))!;
+    fireEvent.click(navClip);
+    await waitFor(() => expect(navClip.getAttribute('aria-selected')).toBe('true'));
+    fireEvent.click(screen.getByRole('tab', { name: 'HISTORY' }));
+
+    const entriesBefore = await screen.findAllByTestId('history-entry');
+    const countBefore = entriesBefore.length;
+
+    // Pin an OLD (non-head) version read-only via "查看".
+    // history() is sorted oldest-first, so the first entry is v1.
+    const viewBtns = screen.getAllByTestId('view-version-btn');
+    fireEvent.click(viewBtns[0]!); // oldest entry = v1
+    const hint = await screen.findByText(/VIEWING v1 ·/);
+    expect(hint).toBeDefined();
+
+    // Find NavBar's component id, push a fresh agent version, then broadcast.
+    const components = await base.rpc('component:list', {});
+    const nav = components.find((c) => /navbar/i.test(c.name))!;
+    await base.rpc('component:update', {
+      componentId: nav.id,
+      tsx: 'export function NavBar(){return null}',
+      css: '/* refreshed */',
+      author: 'agent',
+      message: 'broadcast bump',
+    });
+    act(() => {
+      emit({ kind: 'complift:event', type: 'component:changed', componentId: nav.id });
+    });
+
+    // Timeline gains the new entry…
+    await waitFor(() =>
+      expect(screen.getAllByTestId('history-entry').length).toBe(countBefore + 1),
+    );
+    // …but the user stays pinned on v1 (not yanked to head).
+    expect(screen.getByText(/VIEWING v1 ·/)).toBeDefined();
+  });
+
   it('reflects a relay:status broadcast in the StatusBar', async () => {
     const base = createMockAdapter();
     const { adapter, emit } = withBroadcast(base);

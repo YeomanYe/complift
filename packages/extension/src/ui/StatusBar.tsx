@@ -23,6 +23,8 @@ export function StatusBar(): React.JSX.Element {
           data-connected={relayConnected}
         >
           <i className={`wb-dot ${relayConnected ? 'wb-dot-on' : 'wb-dot-off'}`} aria-hidden="true" />
+          {/* "PLOTTER" is the UI-facing label for what the store/plan call the
+              `relay` (local relay / agent connection) — same thing, two names. */}
           {relayConnected ? 'PLOTTER: ONLINE' : 'PLOTTER: OFFLINE'}
         </span>
         <span className="wb-sb-mcp">MCP :8765</span>
