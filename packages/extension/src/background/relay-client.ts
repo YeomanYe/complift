@@ -137,6 +137,9 @@ export function startRelayClient(options: RelayClientOptions): RelayClient {
 
   const scheduleReconnect = (): void => {
     if (stopped) return;
+    // Clear any pending timer first so rapid error/close churn can't stack
+    // multiple reconnect attempts (which would dial several sockets at once).
+    if (reconnectTimer !== undefined) clearTimeout(reconnectTimer);
     const delay = nextBackoff(attempt);
     attempt += 1;
     reconnectTimer = setTimeout(connect, delay);

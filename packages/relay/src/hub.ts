@@ -57,6 +57,13 @@ export function createHub(port: number, options: HubOptions = {}): Hub {
   const connectionListeners = new Set<(connected: boolean) => void>();
 
   let activeSocket: WebSocket | null = null;
+  // Sockets that have completed the `ext:hello` handshake. A socket is only
+  // routable once it appears here AND is the current activeSocket. This closes
+  // the supersede race: when a 2nd extension connects, activeSocket flips
+  // immediately but is NOT in this set until it sends its own hello, so a
+  // request() in that window correctly rejects extension-not-connected instead
+  // of routing to a not-yet-ready socket.
+  const helloed = new WeakSet<WebSocket>();
   let connected = false;
 
   const ready = new Promise<void>((resolve, reject) => {
@@ -79,9 +86,13 @@ export function createHub(port: number, options: HubOptions = {}): Hub {
   };
 
   wss.on('connection', (socket: WebSocket) => {
-    // A new connection supersedes the old one.
+    // A new connection supersedes the old one. The new socket is NOT routable
+    // until it completes its own `ext:hello`, so drop connection state to false
+    // for the supersede window (a request() here rejects extension-not-connected
+    // rather than targeting the not-yet-ready new socket).
     const previous = activeSocket;
     activeSocket = socket;
+    setConnected(false);
     if (previous !== null && previous !== socket) {
       try {
         previous.close();
@@ -99,7 +110,10 @@ export function createHub(port: number, options: HubOptions = {}): Hub {
       }
 
       if (isExtHello(msg)) {
-        setConnected(true);
+        helloed.add(socket);
+        // Only the currently-active socket drives routable/connected state. A
+        // superseded socket's late hello must not flip us back to connected.
+        if (activeSocket === socket) setConnected(true);
         return;
       }
 
@@ -151,7 +165,12 @@ export function createHub(port: number, options: HubOptions = {}): Hub {
     request(method, params) {
       return new Promise<unknown>((resolve, reject) => {
         const socket = activeSocket;
-        if (socket === null || !connected || socket.readyState !== socket.OPEN) {
+        if (
+          socket === null ||
+          !connected ||
+          !helloed.has(socket) ||
+          socket.readyState !== socket.OPEN
+        ) {
           reject(new Error(ERR_NOT_CONNECTED));
           return;
         }

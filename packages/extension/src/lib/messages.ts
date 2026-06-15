@@ -20,6 +20,10 @@ export interface RpcMap {
   'relay:status':       { req: {}; res: { connected: boolean } };
 }
 export type RpcMethod = keyof RpcMap;
+// SOURCE OF TRUTH for RPC method names. The relay mirrors this list in
+// `packages/relay/src/protocol.ts` (`RELAY_RPC_METHODS`); `protocol.test.ts`
+// asserts the two are set-equal. If you add/remove a method here, update the
+// relay's list too or that test fails.
 export const RPC_METHODS = [
   'component:list',
   'component:get',

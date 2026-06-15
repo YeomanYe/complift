@@ -6,7 +6,7 @@ import {
   ERR_TIMEOUT,
   type Hub,
 } from './hub.js';
-import { isExtHello, type RelayRpc } from './protocol.js';
+import { isExtHello, isExtRpcResult, type RelayRpc } from './protocol.js';
 
 /** Simulate the extension end of the ws link against a real loopback hub. */
 class FakeExtension {
@@ -180,5 +180,67 @@ describe('createHub', () => {
     expect(isExtHello({ kind: 'something-else' })).toBe(false);
     await new Promise((r) => setTimeout(r, 50));
     expect(hub.connected).toBe(false);
+  });
+
+  it('rejects requests until the connected socket has sent ext:hello', async () => {
+    const port = await startHub();
+    const ext = await connectExt(port);
+    // Socket is open but has NOT helloed yet -> not routable.
+    expect(hub.connected).toBe(false);
+    await expect(hub.request('component:list', {})).rejects.toThrow(ERR_NOT_CONNECTED);
+
+    // After the handshake the same request succeeds.
+    ext.reply((rpc) => ({ ok: true, data: { method: rpc.method } }));
+    ext.hello();
+    await waitFor(() => hub.connected);
+    await expect(hub.request('component:list', {})).resolves.toEqual({
+      method: 'component:list',
+    });
+  });
+
+  it('does not route to a superseding socket before it has helloed', async () => {
+    const port = await startHub();
+    const first = await connectExt(port);
+    first.hello();
+    await waitFor(() => hub.connected);
+
+    // Second connection supersedes first immediately, but has NOT helloed.
+    const second = await connectExt(port);
+    // connected must drop to false during the supersede window so requests do
+    // not race to the not-yet-ready new socket.
+    await waitFor(() => !hub.connected);
+    await expect(hub.request('component:list', {})).rejects.toThrow(ERR_NOT_CONNECTED);
+
+    // Once the new socket completes its own handshake, routing resumes to it.
+    second.reply((rpc) => ({ ok: true, data: { from: 'second', method: rpc.method } }));
+    second.hello();
+    await waitFor(() => hub.connected);
+    await expect(hub.request('component:list', {})).resolves.toEqual({
+      from: 'second',
+      method: 'component:list',
+    });
+  });
+
+  it('ignores malformed ext:rpc-result frames (and stays connected)', async () => {
+    const port = await startHub();
+    const ext = await connectExt(port);
+    ext.hello();
+    await waitFor(() => hub.connected);
+
+    // Junk that LOOKS like a result but fails the type guard: missing id / ok,
+    // wrong types, and an unknown id. None should throw or affect state.
+    ext.ws.send(JSON.stringify({ kind: 'ext:rpc-result' }));
+    ext.ws.send(JSON.stringify({ kind: 'ext:rpc-result', id: 42, ok: 'yes' }));
+    ext.ws.send(JSON.stringify({ kind: 'ext:rpc-result', id: 'unknown-id', ok: true }));
+    expect(isExtRpcResult({ kind: 'ext:rpc-result' })).toBe(false);
+
+    await new Promise((r) => setTimeout(r, 50));
+    expect(hub.connected).toBe(true);
+
+    // The hub is still functional after ignoring the junk frames.
+    ext.reply((rpc) => ({ ok: true, data: { method: rpc.method } }));
+    await expect(hub.request('component:list', {})).resolves.toEqual({
+      method: 'component:list',
+    });
   });
 });
