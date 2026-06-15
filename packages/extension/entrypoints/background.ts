@@ -1,5 +1,6 @@
 import { browser } from 'wxt/browser';
 import { createRouter, type OverlayPayload } from '../src/background/router';
+import { startRelayClient } from '../src/background/relay-client';
 import { generate } from '../src/lib/generate/generator';
 import { isRpcRequest, type BroadcastEvent } from '../src/lib/messages';
 import { createComponentStore } from '../src/lib/store/component-store';
@@ -18,6 +19,9 @@ export default defineBackground(() => {
     // 广播尽力而为:side panel / 预览窗未开时无监听者,不视为错误
     void browser.runtime.sendMessage(e).catch(() => {});
   };
+
+  // relay 连接状态:由 relay-client 维护,relay:status RPC 与 StatusBar 读取此值
+  let relayConnected = false;
 
   const router = createRouter({
     store,
@@ -57,8 +61,7 @@ export default defineBackground(() => {
       }
     },
 
-    // Task 11 接 relay 真值
-    relayStatus: () => false,
+    relayStatus: () => relayConnected,
 
     broadcast,
   });
@@ -67,6 +70,15 @@ export default defineBackground(() => {
     if (!isRpcRequest(message)) return;
     void router.handle(message).then(sendResponse);
     return true; // 异步回包
+  });
+
+  // 主动外拨本地 relay(ws 客户端);连接状态变化广播给 StatusBar(Task 9)
+  startRelayClient({
+    router,
+    onStatusChange(connected) {
+      relayConnected = connected;
+      broadcast({ kind: 'complift:event', type: 'relay:status', connected });
+    },
   });
 
   browser.action.onClicked.addListener((tab) => {
