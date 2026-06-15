@@ -4,6 +4,7 @@ import {
   isRenderMessage,
   isRenderResult,
   isRenderSize,
+  whenIframeReady,
 } from './sandbox-protocol';
 import type { RenderResult } from './sandbox-protocol';
 
@@ -263,5 +264,138 @@ describe('createSandboxClient', () => {
     });
 
     expect(sizes).not.toHaveBeenCalled();
+  });
+});
+
+describe('whenIframeReady', () => {
+  /**
+   * 构造一个最小的 iframe 替身：可配置 contentDocument（取值器可抛错以模拟跨域
+   * SecurityError），并带 add/removeEventListener 的 spy + 手动触发 load 的入口。
+   */
+  function makeReadyFake(
+    opts: {
+      /** 'doc' → 可达且 complete；'loading' → 可达但未 complete；'null' → null；'throws' → 取值抛错 */
+      doc: 'doc' | 'loading' | 'null' | 'throws';
+    },
+  ) {
+    let loadListener: (() => void) | null = null;
+    let loadOnce = false;
+    const addEventListener = vi.fn(
+      (type: string, cb: () => void, opts?: { once?: boolean }) => {
+        if (type === 'load') {
+          loadListener = cb;
+          loadOnce = opts?.once === true;
+        }
+      },
+    );
+    const removeEventListener = vi.fn((type: string, cb: () => void) => {
+      if (type === 'load' && loadListener === cb) loadListener = null;
+    });
+    const base = {
+      addEventListener,
+      removeEventListener,
+    };
+    const iframe = base as unknown as HTMLIFrameElement & Record<string, unknown>;
+    Object.defineProperty(iframe, 'contentDocument', {
+      configurable: true,
+      get() {
+        switch (opts.doc) {
+          case 'throws':
+            throw new DOMException('cross-origin', 'SecurityError');
+          case 'null':
+            return null;
+          case 'loading':
+            return { readyState: 'loading' };
+          case 'doc':
+            return { readyState: 'complete' };
+        }
+      },
+    });
+    return {
+      iframe,
+      addEventListener,
+      removeEventListener,
+      /** 触发已注册的 load 监听（若仍挂着）；模拟 DOM 的 { once:true } 自动卸载。 */
+      fireLoad: () => {
+        const cb = loadListener;
+        if (cb === null) return;
+        if (loadOnce) loadListener = null;
+        cb();
+      },
+    };
+  }
+
+  // 设计取舍说明（与实现的诚实注释一致）：whenIframeReady 对“contentDocument 可达
+  // (无 SecurityError、非 null)”一律走同步 cb，因为 jsdom 挂了 src 的 iframe 文档永远停在
+  // readyState='loading' 且永不触发 load——若按 readyState==='complete' 把可达但未完成的
+  // 文档推迟到 load，就会让 Stage/Standalone 的 jsdom 测试死锁。仅“取值抛错(跨域 opaque)”
+  // 与“null(尚未导航)”两种真正不可达的情形才推迟到一次性 load。可达分支额外挂一个一次性
+  // load 监听，以便真实 src 导航完成后用最终文档再渲染一次（早先那次被 sandbox client 顶掉）。
+
+  it('contentDocument 可达且 readyState=complete：cb 同步执行；cleanup 安全且不重复触发', () => {
+    const fakeFrame = makeReadyFake({ doc: 'doc' });
+    const cb = vi.fn();
+    const cleanup = whenIframeReady(fakeFrame.iframe, cb);
+
+    // 可达 → 立即同步渲染
+    expect(cb).toHaveBeenCalledTimes(1);
+    // cleanup 调用安全；它只是摘掉补渲染的 load 监听，不会再次触发 cb
+    expect(() => cleanup()).not.toThrow();
+    expect(cb).toHaveBeenCalledTimes(1);
+    // cleanup 后即便真实导航完成也不再补渲染
+    fakeFrame.fireLoad();
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it('contentDocument 取值抛错（跨域 SecurityError）：cb 不同步执行，load 后触发一次且仅一次', () => {
+    const fakeFrame = makeReadyFake({ doc: 'throws' });
+    const cb = vi.fn();
+    whenIframeReady(fakeFrame.iframe, cb);
+
+    expect(cb).not.toHaveBeenCalled();
+    expect(fakeFrame.addEventListener).toHaveBeenCalledWith('load', expect.any(Function), { once: true });
+
+    fakeFrame.fireLoad();
+    expect(cb).toHaveBeenCalledTimes(1);
+
+    // 一次性：再次触发不应重复调用
+    fakeFrame.fireLoad();
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it('contentDocument === null（尚未导航）：不同步执行，延后到 load 才触发', () => {
+    const fakeFrame = makeReadyFake({ doc: 'null' });
+    const cb = vi.fn();
+    whenIframeReady(fakeFrame.iframe, cb);
+
+    expect(cb).not.toHaveBeenCalled();
+    expect(fakeFrame.addEventListener).toHaveBeenCalledWith('load', expect.any(Function), { once: true });
+    fakeFrame.fireLoad();
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it('contentDocument 可达但 readyState 非 complete：同步渲染（不死锁），并在 load 后补渲染一次', () => {
+    const fakeFrame = makeReadyFake({ doc: 'loading' });
+    const cb = vi.fn();
+    whenIframeReady(fakeFrame.iframe, cb);
+
+    // 可达即同步渲染，避免 jsdom 永不触发 load 导致死锁
+    expect(cb).toHaveBeenCalledTimes(1);
+    // 真实 src 导航完成后用最终文档再渲染一次
+    fakeFrame.fireLoad();
+    expect(cb).toHaveBeenCalledTimes(2);
+  });
+
+  it('cleanup 在 load 前调用（跨域 deferred 分支）：移除监听，cb 永不触发', () => {
+    const fakeFrame = makeReadyFake({ doc: 'throws' });
+    const cb = vi.fn();
+    const cleanup = whenIframeReady(fakeFrame.iframe, cb);
+
+    cleanup();
+    expect(fakeFrame.removeEventListener).toHaveBeenCalledWith('load', expect.any(Function));
+
+    // cleanup 后即使触发 load 也不再调用 cb
+    fakeFrame.fireLoad();
+    expect(cb).not.toHaveBeenCalled();
   });
 });

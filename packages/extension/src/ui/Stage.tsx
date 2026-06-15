@@ -50,10 +50,11 @@ export function Stage(): React.JSX.Element {
   }, [sandboxFactory]);
 
   // Re-render the preview whenever the shown version's files change.
-  // Gate the FIRST render on the iframe `load` event so a not-yet-ready sandbox
-  // doesn't fall back to the 15s render timeout (parity with overlay.content.ts).
-  // Resolves immediately if the iframe is already loaded — keeps the stubbed
-  // sandbox path (tests) from deadlocking.
+  // Route the first render through whenIframeReady (parity with
+  // overlay.content.ts). For an opaque cross-origin sandbox it waits for the
+  // one-shot `load` event so a not-yet-ready iframe doesn't burn the 15s render
+  // timeout; for a reachable, already-loaded iframe (incl. the stubbed sandbox
+  // in tests) it renders synchronously — no load wait, no deadlock.
   const tsx = version?.files.tsx ?? '';
   const css = version?.files.css ?? '';
   useEffect(() => {

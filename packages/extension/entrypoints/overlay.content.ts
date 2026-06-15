@@ -12,7 +12,7 @@ import {
   isOverlayShowMessage,
   type OverlayShowMessage,
 } from '../src/background/router';
-import { createSandboxClient, type SandboxClient } from '../src/lib/sandbox-protocol';
+import { createSandboxClient, whenIframeReady, type SandboxClient } from '../src/lib/sandbox-protocol';
 import { hideOverlay, showOverlay, type OverlayHandle } from '../src/overlay/overlay-ui';
 
 declare global {
@@ -23,8 +23,11 @@ declare global {
 
 let handle: OverlayHandle | null = null;
 let client: SandboxClient | null = null;
+let detachReady: (() => void) | null = null;
 
 function teardown(): void {
+  detachReady?.();
+  detachReady = null;
   client?.dispose();
   client = null;
   if (handle !== null) {
@@ -52,13 +55,14 @@ function show(msg: OverlayShowMessage): void {
     return;
   }
 
-  // sandbox iframe 加载完成后,用组件当前版本文件渲染
+  // sandbox iframe 就绪后,用组件当前版本文件渲染(走 whenIframeReady,
+  // 与 Stage/Standalone 完全一致:跨域 sandbox 等 load,同源/已就绪则立即渲染)。
   const { iframe } = handle;
   client = createSandboxClient(iframe);
   const render = (): void => {
     void client?.render(payload.files.tsx, payload.files.css);
   };
-  iframe.addEventListener('load', render, { once: true });
+  detachReady = whenIframeReady(iframe, render);
 }
 
 export default defineContentScript({

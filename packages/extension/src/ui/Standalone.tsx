@@ -91,9 +91,11 @@ export function Standalone({
     };
   }, [sandboxFactory]);
 
-  // Render the preview whenever the shown version's files change. Gate the first
-  // render on the iframe `load` event (parity with overlay.content.ts), resolving
-  // immediately when the iframe is already loaded so the stubbed path never hangs.
+  // Render the preview whenever the shown version's files change. Route the first
+  // render through whenIframeReady (parity with overlay.content.ts): an opaque
+  // cross-origin sandbox waits for the one-shot `load` event (avoids the 15s
+  // render timeout), while a reachable, already-loaded iframe (incl. the stubbed
+  // path in tests) renders synchronously — no load wait, no hang.
   const tsx = version?.files.tsx ?? '';
   const css = version?.files.css ?? '';
   useEffect(() => {

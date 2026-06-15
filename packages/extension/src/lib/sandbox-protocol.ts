@@ -73,29 +73,52 @@ export const isRenderSize = (m: unknown): m is RenderSizeMessage => {
 
 /**
  * Run `cb` once the sandbox `iframe` is ready to receive a render request.
+ * Returns a cleanup function that detaches any pending `load` listener.
  *
- * The production sandbox is a chrome-extension sandboxed page rendered in an
- * opaque cross-origin context: `contentDocument` is `null`/throws until it has
- * navigated, so we gate the first render on the one-shot `load` event (parity
- * with overlay.content.ts — avoids relying on the 15s render timeout).
+ * This is a best-effort heuristic, NOT a hard guarantee. Two paths:
  *
- * When the iframe's document IS reachable (a same-origin / stubbed iframe, e.g.
- * jsdom in tests, where the `load` event may never fire), there is no cross-doc
- * navigation to await, so `cb` runs synchronously — the stub path never hangs.
- * Returns a cleanup function that detaches the pending listener.
+ * 1. Deferred path (production sandbox). The MV3 sandbox is a chrome-extension
+ *    sandboxed page in an opaque cross-origin context: reading `contentDocument`
+ *    throws a SecurityError, or returns `null` while the frame is still loading.
+ *    There is no locally-reachable document to render into yet, so we gate the
+ *    first render on the one-shot `load` event (parity with overlay.content.ts)
+ *    instead of letting the first render burn the 15s render timeout.
+ *
+ * 2. Reachable path (same-origin / jsdom stub). When `contentDocument` is
+ *    readable (no SecurityError, non-null), the frame is same-origin and its
+ *    document is locally available, so `cb` runs synchronously and we never wait
+ *    on a `load` event that may never arrive (jsdom mounts a `src` iframe whose
+ *    document sits at readyState 'loading' forever and never fires `load`).
+ *
+ *    Honesty caveat: "reachable" is weaker than "the real `src` has finished
+ *    loading". A freshly-mounted same-origin iframe exposes a non-null
+ *    about:blank / loading document *before* its `src` resolves, so this path
+ *    can fire one render against a not-yet-final document. We additionally
+ *    register a one-shot `load` listener so that, when the real navigation does
+ *    complete, `cb` runs again with the final document — the earlier render is
+ *    simply superseded by the sandbox client. (In jsdom that `load` never fires,
+ *    so only the synchronous render happens; the stub path is driven and never
+ *    deadlocks.) We do NOT gate the sync render on `readyState === 'complete'`,
+ *    because a real `src` iframe reports 'loading' until `load`, which jsdom
+ *    never emits — gating there would deadlock the test stub.
  */
 export function whenIframeReady(iframe: HTMLIFrameElement, cb: () => void): () => void {
-  let docReachable = false;
+  let reachable = false;
   try {
-    docReachable = iframe.contentDocument != null;
+    reachable = iframe.contentDocument != null;
   } catch {
     // SecurityError → genuinely cross-origin sandbox still loading.
-    docReachable = false;
+    reachable = false;
   }
-  if (docReachable) {
+  if (reachable) {
+    // Same-origin / stub: render now (can't deadlock), and also re-render once
+    // the real `src` navigation completes (see honesty caveat above).
+    const onLoad = (): void => cb();
+    iframe.addEventListener('load', onLoad, { once: true });
     cb();
-    return () => {};
+    return () => iframe.removeEventListener('load', onLoad);
   }
+  // Opaque cross-origin (throw) or not-yet-navigated (null): wait for `load`.
   const onLoad = (): void => cb();
   iframe.addEventListener('load', onLoad, { once: true });
   return () => iframe.removeEventListener('load', onLoad);
