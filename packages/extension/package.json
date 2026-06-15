@@ -4,14 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wxt",
-    "build": "wxt build",
-    "zip": "wxt zip",
-    "postinstall": "wxt prepare",
+    "copy-wasm": "node scripts/copy-esbuild-wasm.mjs",
+    "dev": "pnpm run copy-wasm && wxt",
+    "build": "pnpm run copy-wasm && wxt build",
+    "zip": "pnpm run copy-wasm && wxt zip",
+    "postinstall": "node scripts/copy-esbuild-wasm.mjs && wxt prepare",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "esbuild-wasm": "^0.28.1",
     "idb": "^8.0.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

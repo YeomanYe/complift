@@ -1,0 +1,2 @@
+# Generated at install/build by scripts/copy-esbuild-wasm.mjs
+public/esbuild.wasm
