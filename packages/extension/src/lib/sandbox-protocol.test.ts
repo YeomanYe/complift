@@ -3,6 +3,7 @@ import {
   createSandboxClient,
   isRenderMessage,
   isRenderResult,
+  isRenderSize,
 } from './sandbox-protocol';
 import type { RenderResult } from './sandbox-protocol';
 
@@ -58,6 +59,25 @@ describe('isRenderResult', () => {
     expect(isRenderResult({ kind: 'complift:render', id: 'a', ok: true })).toBe(false);
     expect(isRenderResult({ kind: 'complift:render-result', id: 'a', ok: 'yes' })).toBe(false);
     expect(isRenderResult(undefined)).toBe(false);
+  });
+});
+
+describe('isRenderSize', () => {
+  it('接受带 size 的 render-size 消息', () => {
+    expect(
+      isRenderSize({
+        kind: 'complift:render-size',
+        id: 'a',
+        size: { width: 10, height: 20 },
+      }),
+    ).toBe(true);
+  });
+
+  it('拒绝 kind 不符 / size 缺失或非数字 / 非对象', () => {
+    expect(isRenderSize({ kind: 'complift:render-result', id: 'a', size: { width: 1, height: 2 } })).toBe(false);
+    expect(isRenderSize({ kind: 'complift:render-size', id: 'a' })).toBe(false);
+    expect(isRenderSize({ kind: 'complift:render-size', id: 'a', size: { width: '1', height: 2 } })).toBe(false);
+    expect(isRenderSize(null)).toBe(false);
   });
 });
 
@@ -199,5 +219,49 @@ describe('createSandboxClient', () => {
     expect(() =>
       dispatchFrom(fake.contentWindow, { kind: 'complift:render-result', id: 'x', ok: true }),
     ).not.toThrow();
+  });
+
+  it('onSize 订阅者收到 render-size 更新（不影响 render-result）', () => {
+    client = createSandboxClient(fake.iframe);
+    const sizes = vi.fn();
+    client.onSize(sizes);
+
+    dispatchFrom(fake.contentWindow, {
+      kind: 'complift:render-size',
+      id: 'r1',
+      size: { width: 120, height: 60 },
+    });
+
+    expect(sizes).toHaveBeenCalledTimes(1);
+    expect(sizes).toHaveBeenCalledWith('r1', { width: 120, height: 60 });
+  });
+
+  it('onSize 返回的 unsubscribe 生效后不再收到更新', () => {
+    client = createSandboxClient(fake.iframe);
+    const sizes = vi.fn();
+    const unsubscribe = client.onSize(sizes);
+
+    unsubscribe();
+    dispatchFrom(fake.contentWindow, {
+      kind: 'complift:render-size',
+      id: 'r1',
+      size: { width: 10, height: 10 },
+    });
+
+    expect(sizes).not.toHaveBeenCalled();
+  });
+
+  it('忽略 source 不是 iframe.contentWindow 的 render-size', () => {
+    client = createSandboxClient(fake.iframe);
+    const sizes = vi.fn();
+    client.onSize(sizes);
+
+    dispatchFrom({ other: 'window' }, {
+      kind: 'complift:render-size',
+      id: 'r1',
+      size: { width: 10, height: 10 },
+    });
+
+    expect(sizes).not.toHaveBeenCalled();
   });
 });

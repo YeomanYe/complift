@@ -18,6 +18,7 @@ import * as esbuild from 'esbuild-wasm';
 import {
   isRenderMessage,
   type RenderResultMessage,
+  type RenderSizeMessage,
 } from '../../src/lib/sandbox-protocol';
 
 // Bridge real modules to the compiled IIFE via globals (see esbuildBanner).
@@ -104,7 +105,7 @@ function getRootEl(): HTMLElement {
   return el;
 }
 
-/** Observe #root and report its size back to the host once per render. */
+/** Compute the element's rounded-up pixel size (no observing/reporting). */
 function measure(el: HTMLElement): { width: number; height: number } {
   const rect = el.getBoundingClientRect();
   return { width: Math.ceil(rect.width), height: Math.ceil(rect.height) };
@@ -124,11 +125,14 @@ async function compile(tsx: string): Promise<string> {
   return result.outputFiles?.[0]?.text ?? '';
 }
 
-/** Pick the component to render from the compiled module's exports. */
+/**
+ * Pick the component to render: prefer the default export, then fall back to
+ * the first PascalCase-named function export (the React component convention).
+ */
 function pickComponent(mod: Record<string, unknown>): unknown {
   if (typeof mod.default === 'function') return mod.default;
-  for (const value of Object.values(mod)) {
-    if (typeof value === 'function') return value;
+  for (const [name, value] of Object.entries(mod)) {
+    if (typeof value === 'function' && /^[A-Z]/.test(name)) return value;
   }
   return null;
 }
@@ -175,7 +179,9 @@ async function handleRender(
 
     const Component = pickComponent(moduleExports);
     if (typeof Component !== 'function') {
-      throw new Error('No component export found (expected a default export).');
+      throw new Error(
+        'No component export found (expected a default export or a PascalCase-named export).',
+      );
     }
 
     if (!root) root = createRoot(el);
@@ -183,6 +189,9 @@ async function handleRender(
 
     // Allow the commit to flush before measuring.
     await new Promise((r) => requestAnimationFrame(() => r(null)));
+    // The render succeeded: from now on the ResizeObserver may report sizes
+    // for this id.
+    lastOkRenderId = id;
     return {
       kind: 'complift:render-result',
       id,
@@ -192,24 +201,27 @@ async function handleRender(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     renderError(el, message);
+    // This render did not succeed: never vouch ok:true for it via resize.
+    if (lastOkRenderId === id) lastOkRenderId = null;
     return { kind: 'complift:render-result', id, ok: false, error: message };
   }
 }
 
-function post(message: RenderResultMessage): void {
+function post(message: RenderResultMessage | RenderSizeMessage): void {
   // Replies travel back to the embedding host window.
   window.parent?.postMessage(message, '*');
 }
 
-// Report size changes after a successful render via ResizeObserver.
-let lastRenderId: string | null = null;
+// Id of the last render that actually compiled + mounted. Only this id is
+// eligible for ResizeObserver size updates; cleared while a render is in
+// flight and on failure so we never vouch for an unsuccessful render.
+let lastOkRenderId: string | null = null;
 const rootEl = getRootEl();
 const resizeObserver = new ResizeObserver(() => {
-  if (!lastRenderId || !root) return;
+  if (!lastOkRenderId || !root) return;
   post({
-    kind: 'complift:render-result',
-    id: lastRenderId,
-    ok: true,
+    kind: 'complift:render-size',
+    id: lastOkRenderId,
     size: measure(rootEl),
   });
 });
@@ -218,11 +230,14 @@ resizeObserver.observe(rootEl);
 window.addEventListener('message', (event: MessageEvent) => {
   const data = event.data;
   if (!isRenderMessage(data)) return;
-  lastRenderId = data.id;
+  // Silence size reporting until this render confirms success.
+  lastOkRenderId = null;
   void handleRender(data.id, data.tsx, data.css).then(post);
 });
 
 // Kick off wasm initialization eagerly so the first render is fast.
 void ensureEsbuild();
 
-console.log('complift sandbox ready');
+if (import.meta.env?.DEV) {
+  console.log('complift sandbox ready');
+}
