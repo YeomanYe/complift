@@ -1,0 +1,35 @@
+/* ============================================================
+   complift · Drafting Bench / 制图台 — design tokens (UI-1 single source)
+   Values sourced from mockup-3 (docs/rules/ui/rules.md). Components must
+   reference these variables only — no inline hex / bare font names.
+   Semantics (UI-2): blueprint = static/baseline, safety = change.
+   ============================================================ */
+
+:root {
+  /* paper / ink */
+  --paper: #f7f5f0;
+  --grid: #e8e4d9;
+  --grid-strong: #dcd6c6;
+  --ink: #21211d;
+  --ink-2: #6e6a5e;
+  --ink-3: #9a958a;
+  --line: #d8d2c2;
+  --paper-2: #f2efe7;
+  --paper-3: #f1eee5;
+  --white: #ffffff; /* neutral surface / contrast text on accents */
+
+  /* dual accent (UI-2 semantics) */
+  --blueprint: #1e4fd8; /* cobalt — static / baseline */
+  --blueprint-soft: rgba(30, 79, 216, 0.08);
+  --safety: #e8743b; /* ember/orange — change */
+  --safety-soft: rgba(232, 116, 59, 0.1);
+
+  /* code support hues (palette-disciplined) */
+  --code-str: #8a6630;
+  --code-cm: #9a958a;
+  --code-type: #16399a;
+
+  /* IBM Plex local fallback stacks (no external CDN) */
+  --sans: 'IBM Plex Sans', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', 'SF Mono', Menlo, Consolas, monospace;
+}

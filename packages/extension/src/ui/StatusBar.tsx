@@ -1,0 +1,33 @@
+import { useWorkbench } from './context';
+
+/**
+ * Top status strip: relay connection dot + "MCP :8765" + current version number.
+ * (mockup-3 .statusbar — blueprint=static, safety=change semantics.)
+ */
+export function StatusBar(): React.JSX.Element {
+  const relayConnected = useWorkbench((s) => s.relayConnected);
+  const version = useWorkbench((s) => s.currentVersion);
+
+  return (
+    <div className="wb-statusbar">
+      <div className="wb-sb-left">
+        <span className="wb-sb-mark" aria-hidden="true">
+          ⌗
+        </span>
+        <span className="wb-sb-name">COMPLIFT</span>
+      </div>
+      <div className="wb-sb-right">
+        <span
+          className={`wb-sb-relay ${relayConnected ? 'is-on' : 'is-off'}`}
+          data-testid="relay-status"
+          data-connected={relayConnected}
+        >
+          <i className={`wb-dot ${relayConnected ? 'wb-dot-on' : 'wb-dot-off'}`} aria-hidden="true" />
+          {relayConnected ? 'PLOTTER: ONLINE' : 'PLOTTER: OFFLINE'}
+        </span>
+        <span className="wb-sb-mcp">MCP :8765</span>
+        {version !== null && <span className="wb-sb-ver">v{version.seq}</span>}
+      </div>
+    </div>
+  );
+}

@@ -1,9 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { createChromeAdapter } from '../../src/platform/chrome-adapter';
+import { Workbench } from '../../src/ui/Workbench';
 
-function App() {
-  return <div>complift</div>;
-}
+const adapter = createChromeAdapter();
 
 const container = document.getElementById('root');
 if (!container) {
@@ -11,6 +11,6 @@ if (!container) {
 }
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <Workbench adapter={adapter} />
   </StrictMode>,
 );
