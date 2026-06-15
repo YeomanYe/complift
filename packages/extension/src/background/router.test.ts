@@ -9,7 +9,12 @@ import type {
   RpcRequest,
 } from '../lib/messages';
 import type { CaptureIR } from '../lib/types';
-import { createRouter, type RouterDeps } from './router';
+import {
+  createRouter,
+  isOverlayHideMessage,
+  isOverlayShowMessage,
+  type RouterDeps,
+} from './router';
 
 const meta = {
   name: 'PricingCard',
@@ -241,6 +246,22 @@ describe('createRouter', () => {
     expect(res.ok).toBe(true);
     expect(res.data).toEqual({ ok: true });
     expect(deps.hideOverlay).toHaveBeenCalledWith(undefined);
+  });
+
+  it('overlay 线协议 guards 识别 show/hide 消息', () => {
+    expect(
+      isOverlayShowMessage({
+        kind: 'complift:overlay-show',
+        sandboxUrl: '/sandbox.html',
+        payload: { componentId: 'c1' },
+      }),
+    ).toBe(true);
+    expect(isOverlayShowMessage({ kind: 'complift:overlay-show' })).toBe(false);
+    expect(isOverlayShowMessage({ kind: 'other' })).toBe(false);
+
+    expect(isOverlayHideMessage({ kind: 'complift:overlay-hide' })).toBe(true);
+    expect(isOverlayHideMessage({ kind: 'complift:overlay-show' })).toBe(false);
+    expect(isOverlayHideMessage(null)).toBe(false);
   });
 
   it('relay:status 透传 relayStatus 返回值', async () => {

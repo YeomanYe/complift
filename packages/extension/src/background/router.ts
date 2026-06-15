@@ -16,6 +16,32 @@ export interface OverlayPayload {
   sourceSelector: string;
 }
 
+/** Wire message: background → overlay content script (show with payload). */
+export interface OverlayShowMessage {
+  kind: 'complift:overlay-show';
+  payload: OverlayPayload;
+  /** Web-accessible sandbox URL for the overlay iframe (resolved by background). */
+  sandboxUrl: string;
+}
+
+/** Wire message: background → overlay content script (tear down). */
+export interface OverlayHideMessage {
+  kind: 'complift:overlay-hide';
+}
+
+export const isOverlayShowMessage = (m: unknown): m is OverlayShowMessage => {
+  if (typeof m !== 'object' || m === null) return false;
+  const msg = m as Record<string, unknown>;
+  return msg.kind === 'complift:overlay-show'
+    && typeof msg.sandboxUrl === 'string'
+    && typeof msg.payload === 'object' && msg.payload !== null;
+};
+
+export const isOverlayHideMessage = (m: unknown): m is OverlayHideMessage => {
+  if (typeof m !== 'object' || m === null) return false;
+  return (m as Record<string, unknown>).kind === 'complift:overlay-hide';
+};
+
 export interface RouterDeps {
   store: ComponentStore;
   generate: typeof generate;

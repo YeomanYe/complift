@@ -41,9 +41,10 @@ export default defineBackground(() => {
         await browser.tabs.sendMessage(target, {
           kind: 'complift:overlay-show',
           payload,
+          sandboxUrl: browser.runtime.getURL('/sandbox.html'),
         });
       } catch {
-        // overlay content script(Task 10)未就绪时容错
+        // overlay content script 未就绪时容错(executeScript 与 sendMessage 之间的竞态)
       }
     },
 

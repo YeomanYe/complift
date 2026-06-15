@@ -52,6 +52,7 @@ function withBroadcast(adapter: PlatformAdapter): {
       };
     },
     sandboxUrl: adapter.sandboxUrl.bind(adapter),
+    openStandalone: adapter.openStandalone.bind(adapter),
   };
   const emit = (e: BroadcastEvent): void => {
     for (const cb of listeners) cb(e);
@@ -137,6 +138,19 @@ describe('Workbench — Drafting Bench', () => {
     );
   });
 
+  it('"Open window" calls openStandalone with the current component id', async () => {
+    const adapter = createMockAdapter();
+    const openSpy = vi.spyOn(adapter, 'openStandalone');
+    renderWorkbench(adapter, sandbox.factory);
+
+    const clips = await screen.findAllByTestId('filmstrip-clip');
+    fireEvent.click(clips[0]!);
+    await waitFor(() => expect(clips[0]!.getAttribute('aria-selected')).toBe('true'));
+
+    fireEvent.click(screen.getByText(/OPEN WINDOW/i));
+    expect(openSpy).toHaveBeenCalledWith(expect.any(String));
+  });
+
   it('saves edited code via the component:update RPC (author manual)', async () => {
     const adapter = createMockAdapter();
     const rpcSpy = vi.spyOn(adapter, 'rpc');
@@ -182,6 +196,7 @@ describe('Workbench — Drafting Bench', () => {
       },
       onEvent: base.onEvent.bind(base),
       sandboxUrl: base.sandboxUrl.bind(base),
+      openStandalone: base.openStandalone.bind(base),
     };
 
     renderWorkbench(adapter, sandbox.factory);

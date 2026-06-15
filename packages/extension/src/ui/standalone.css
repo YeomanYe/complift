@@ -1,0 +1,96 @@
+/* ============================================================
+   complift · Standalone preview window — production styles
+   Reuses tokens.css (UI-1). Semantics (UI-2): --blueprint = baseline.
+   ============================================================ */
+
+@import './tokens.css';
+
+.st-root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.st-root *,
+.st-root *::before,
+.st-root *::after {
+  box-sizing: border-box;
+}
+
+.st-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+}
+
+.st-title {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.st-ver {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.st-spacer {
+  flex: 1;
+}
+
+.st-preset {
+  font: 11px var(--mono);
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.st-preset.is-on {
+  background: var(--blueprint);
+  border-color: var(--blueprint);
+  color: var(--white);
+}
+
+.st-stage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: auto;
+  padding: 24px;
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 16px 16px,
+    var(--paper);
+}
+
+.st-frame {
+  border: 0;
+  width: 1024px;
+  max-width: 100%;
+  min-height: 320px;
+  height: calc(100vh - 8px);
+  background: var(--white);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.st-error {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--safety);
+  padding: 24px;
+  white-space: pre-wrap;
+}

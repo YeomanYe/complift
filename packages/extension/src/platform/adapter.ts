@@ -8,4 +8,9 @@ export interface PlatformAdapter {
   rpc<M extends RpcMethod>(method: M, params: RpcMap[M]['req']): Promise<RpcMap[M]['res']>;
   onEvent(cb: (e: BroadcastEvent) => void): () => void;
   sandboxUrl(): string;
+  /**
+   * 打开指定组件的独立预览窗(扩展页 standalone.html?componentId=...)。
+   * 真实环境经 chrome.windows.create;mock 环境 no-op。
+   */
+  openStandalone(componentId: string): Promise<void>;
 }

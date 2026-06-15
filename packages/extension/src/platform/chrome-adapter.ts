@@ -57,5 +57,12 @@ export function createChromeAdapter(): PlatformAdapter {
     sandboxUrl() {
       return browser.runtime.getURL('/sandbox.html');
     },
+
+    async openStandalone(componentId) {
+      const url = browser.runtime.getURL(
+        `/standalone.html?componentId=${encodeURIComponent(componentId)}`,
+      );
+      await browser.windows.create({ url, type: 'popup', width: 1024, height: 768 });
+    },
   };
 }

@@ -149,8 +149,12 @@ export function Stage(): React.JSX.Element {
         <button
           type="button"
           className="wb-tr-toggle wb-tr-window"
-          disabled
-          title="独立预览窗 (Task 10)"
+          disabled={version === null}
+          title="独立预览窗"
+          onClick={() => {
+            const componentId = version?.componentId;
+            if (componentId !== undefined) void adapter.openStandalone(componentId);
+          }}
         >
           ⤢ OPEN WINDOW
         </button>

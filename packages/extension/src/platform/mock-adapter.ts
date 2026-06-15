@@ -226,5 +226,9 @@ export function createMockAdapter(fixtures: MockFixture[] = defaultFixtures()): 
     sandboxUrl() {
       return '/sandbox-mock.html';
     },
+
+    async openStandalone() {
+      // preview / 测试环境无独立窗,no-op。
+    },
   };
 }

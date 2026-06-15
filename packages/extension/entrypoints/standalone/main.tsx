@@ -1,9 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { createChromeAdapter } from '../../src/platform/chrome-adapter';
+import { Standalone } from '../../src/ui/Standalone';
 
-function App() {
-  return <div>complift</div>;
-}
+const adapter = createChromeAdapter();
+const componentId = new URLSearchParams(window.location.search).get('componentId') ?? '';
 
 const container = document.getElementById('root');
 if (!container) {
@@ -11,6 +12,6 @@ if (!container) {
 }
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <Standalone adapter={adapter} componentId={componentId} />
   </StrictMode>,
 );
