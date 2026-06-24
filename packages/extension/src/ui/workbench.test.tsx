@@ -293,4 +293,50 @@ describe('Workbench — Drafting Bench', () => {
     );
     expect(within(screen.getByTestId('relay-status')).getByText(/PLOTTER: ONLINE/i)).toBeDefined();
   });
+
+  it('pick toggle starts then cancels the picker via RPC, reflecting state', async () => {
+    const adapter = createMockAdapter();
+    renderWorkbench(adapter, sandbox.factory);
+    await screen.findAllByTestId('filmstrip-clip');
+
+    const toggle = screen.getByTestId('pick-toggle');
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    expect(within(toggle).queryByText(/SELECT/i)).not.toBeNull();
+
+    // Click → picker:start → broadcast picker:state{active:true} → toggle on.
+    fireEvent.click(toggle);
+    await waitFor(() =>
+      expect(screen.getByTestId('pick-toggle').getAttribute('aria-pressed')).toBe('true'),
+    );
+    expect(within(screen.getByTestId('pick-toggle')).queryByText(/PICKING/i)).not.toBeNull();
+
+    // Click again → picker:cancel → broadcast picker:state{active:false} → toggle off.
+    fireEvent.click(screen.getByTestId('pick-toggle'));
+    await waitFor(() =>
+      expect(screen.getByTestId('pick-toggle').getAttribute('aria-pressed')).toBe('false'),
+    );
+  });
+
+  it('flips the pick toggle off on a picker:state broadcast (in-page ESC / pick)', async () => {
+    const base = createMockAdapter();
+    const { adapter, emit } = withBroadcast(base);
+    renderWorkbench(adapter, sandbox.factory);
+    await screen.findAllByTestId('filmstrip-clip');
+
+    // Picking turned on out-of-band (e.g. toolbar icon started it).
+    act(() => {
+      emit({ kind: 'complift:event', type: 'picker:state', active: true });
+    });
+    await waitFor(() =>
+      expect(screen.getByTestId('pick-toggle').getAttribute('aria-pressed')).toBe('true'),
+    );
+
+    // In-page ESC / a completed pick announces picking ended → toggle off.
+    act(() => {
+      emit({ kind: 'complift:event', type: 'picker:state', active: false });
+    });
+    await waitFor(() =>
+      expect(screen.getByTestId('pick-toggle').getAttribute('aria-pressed')).toBe('false'),
+    );
+  });
 });

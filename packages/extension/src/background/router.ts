@@ -59,6 +59,8 @@ export interface RouterDeps {
   store: ComponentStore;
   generate: typeof generate;
   injectPicker(tabId: number | undefined): Promise<void>;
+  /** Tell the active tab's in-page picker to dispose (panel-initiated cancel). */
+  stopPicker(tabId: number | undefined): Promise<void>;
   injectOverlay(tabId: number | undefined, payload: OverlayPayload): Promise<void>;
   hideOverlay(tabId: number | undefined): Promise<void>;
   relayStatus(): boolean;
@@ -124,15 +126,23 @@ export function createRouter(deps: RouterDeps): Router {
         type: 'picker:picked',
         componentId: component.id,
       });
+      // A pick ends picking — flip the toggle off in sync with picker:picked.
+      deps.broadcast({ kind: 'complift:event', type: 'picker:state', active: false });
       return { component, version };
     },
 
     async 'picker:start'({ tabId }) {
       await deps.injectPicker(tabId);
+      deps.broadcast({ kind: 'complift:event', type: 'picker:state', active: true });
       return { ok: true };
     },
 
     async 'picker:cancel'() {
+      // Stop whatever picker is live on the active tab (no-op if already gone),
+      // then announce picking is off. Both the panel toggle and an in-page ESC
+      // funnel through here, so the broadcast is the single source of truth.
+      await deps.stopPicker(undefined);
+      deps.broadcast({ kind: 'complift:event', type: 'picker:state', active: false });
       return { ok: true };
     },
 

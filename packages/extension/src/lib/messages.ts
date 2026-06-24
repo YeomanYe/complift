@@ -49,7 +49,10 @@ export type BroadcastEvent =
   | { kind: 'complift:event'; type: 'component:changed'; componentId: string }
   | { kind: 'complift:event'; type: 'component:created'; componentId: string }
   | { kind: 'complift:event'; type: 'relay:status'; connected: boolean }
-  | { kind: 'complift:event'; type: 'picker:picked'; componentId: string };
+  | { kind: 'complift:event'; type: 'picker:picked'; componentId: string }
+  // picker mode toggled on/off — keeps the side-panel toggle in sync with the
+  // in-page picker, whichever side initiated the change (button, ESC, or pick).
+  | { kind: 'complift:event'; type: 'picker:state'; active: boolean };
 export const isRpcRequest = (m: unknown): m is RpcRequest => {
   if (typeof m !== 'object' || m === null) return false;
   const msg = m as Record<string, unknown>;

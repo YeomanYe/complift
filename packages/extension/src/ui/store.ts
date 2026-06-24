@@ -20,9 +20,15 @@ export interface WorkbenchStore {
   error: string | null;
   /** Local relay / agent connection indicator. */
   relayConnected: boolean;
+  /** Whether in-page element picking is currently active (drives the toggle). */
+  picking: boolean;
 
   /** Load components + relay status, select the first component if any. */
   load(adapter: PlatformAdapter): Promise<void>;
+  /** Toggle in-page element picking on/off (start/cancel the picker). */
+  togglePicking(adapter: PlatformAdapter): Promise<void>;
+  /** Set picking state from a `picker:state` broadcast (single source of truth). */
+  setPicking(active: boolean): void;
   /** Switch the component on stage (resets to head version). */
   select(adapter: PlatformAdapter, componentId: string): Promise<void>;
   /** Pin an older version on the Stage (read-only view). */
@@ -68,6 +74,24 @@ export const createWorkbenchStore = (): UseBoundStore<StoreApi<WorkbenchStore>> 
     state: 'loading',
     error: null,
     relayConnected: false,
+    picking: false,
+
+    async togglePicking(adapter) {
+      const next = !get().picking;
+      // Optimistic flip for instant feedback; the picker:state broadcast is the
+      // authority and will reconcile (e.g. when a pick or ESC ends picking).
+      set({ picking: next });
+      try {
+        await adapter.rpc(next ? 'picker:start' : 'picker:cancel', {});
+      } catch {
+        // Roll back the optimistic flip if the start/cancel RPC failed.
+        set({ picking: !next });
+      }
+    },
+
+    setPicking(active) {
+      set({ picking: active });
+    },
 
     async load(adapter) {
       const seq = ++reqSeq;

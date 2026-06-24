@@ -1,12 +1,16 @@
-import { useWorkbench } from './context';
+import { useAdapter, useWorkbench } from './context';
 
 /**
- * Top status strip: relay connection dot + "MCP :8765" + current version number.
+ * Top status strip: pick-element toggle + relay connection dot + "MCP :8765" +
+ * current version number.
  * (mockup-3 .statusbar — blueprint=static, safety=change semantics.)
  */
 export function StatusBar(): React.JSX.Element {
+  const adapter = useAdapter();
   const relayConnected = useWorkbench((s) => s.relayConnected);
   const version = useWorkbench((s) => s.currentVersion);
+  const picking = useWorkbench((s) => s.picking);
+  const togglePicking = useWorkbench((s) => s.togglePicking);
 
   return (
     <div className="wb-statusbar">
@@ -17,6 +21,16 @@ export function StatusBar(): React.JSX.Element {
         <span className="wb-sb-name">COMPLIFT</span>
       </div>
       <div className="wb-sb-right">
+        <button
+          type="button"
+          className={`wb-sb-pick ${picking ? 'is-on' : ''}`}
+          aria-pressed={picking}
+          data-testid="pick-toggle"
+          title="选取页面元素（ESC 取消）"
+          onClick={() => void togglePicking(adapter)}
+        >
+          {picking ? '◉ PICKING…' : '◎ SELECT'}
+        </button>
         <span
           className={`wb-sb-relay ${relayConnected ? 'is-on' : 'is-off'}`}
           data-testid="relay-status"

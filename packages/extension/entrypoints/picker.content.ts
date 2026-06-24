@@ -7,13 +7,37 @@
 import { browser } from 'wxt/browser';
 import type { RpcRequest, RpcResponse } from '../src/lib/messages';
 import { extractElement } from '../src/lib/extract/extractor';
-import { showToast, startPicker } from '../src/picker/picker-ui';
+import { cancelActivePicker, showToast, startPicker } from '../src/picker/picker-ui';
 import { computeSourceSelector } from '../src/picker/source-selector';
 
 declare global {
   interface Window {
     __compliftPickerActive?: boolean;
+    __compliftPickerStopWired?: boolean;
   }
+}
+
+/** Tell background the picker mode ended so the side-panel toggle flips off. */
+function notifyCancelled(): void {
+  const req: RpcRequest<'picker:cancel'> = {
+    kind: 'complift:rpc',
+    id: crypto.randomUUID(),
+    method: 'picker:cancel',
+    params: {},
+  };
+  void browser.runtime.sendMessage(req);
+}
+
+// Wire the panel-initiated stop listener once per page (survives re-injection).
+// `complift:picker-stop` disposes the live picker silently (no cancel echo).
+if (window.__compliftPickerStopWired !== true) {
+  window.__compliftPickerStopWired = true;
+  browser.runtime.onMessage.addListener((message: unknown) => {
+    if ((message as { kind?: string } | null)?.kind === 'complift:picker-stop') {
+      cancelActivePicker();
+      window.__compliftPickerActive = false;
+    }
+  });
 }
 
 async function capture(el: Element): Promise<void> {
@@ -54,7 +78,11 @@ export default defineContentScript({
         finish();
         void capture(el);
       },
-      onCancel: finish,
+      onCancel() {
+        finish();
+        // In-page cancel (ESC / breadcrumb ✕) → keep the side-panel toggle in sync.
+        notifyCancelled();
+      },
     });
   },
 });

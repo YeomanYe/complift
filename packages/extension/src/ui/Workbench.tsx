@@ -51,6 +51,7 @@ function WorkbenchShell(): React.JSX.Element {
   const load = useWorkbench((s) => s.load);
   const refreshCurrent = useWorkbench((s) => s.refreshCurrent);
   const setRelayConnected = useWorkbench((s) => s.setRelayConnected);
+  const setPicking = useWorkbench((s) => s.setPicking);
   const state = useWorkbench((s) => s.state);
   const error = useWorkbench((s) => s.error);
   const currentId = useWorkbench((s) => s.currentId);
@@ -67,6 +68,10 @@ function WorkbenchShell(): React.JSX.Element {
         setRelayConnected(e.connected);
         return;
       }
+      if (e.type === 'picker:state') {
+        setPicking(e.active);
+        return;
+      }
       if (e.type === 'component:changed' && e.componentId === currentId) {
         void refreshCurrent(adapter);
         return;
@@ -77,7 +82,7 @@ function WorkbenchShell(): React.JSX.Element {
       }
     });
     return unsub;
-  }, [adapter, currentId, load, refreshCurrent, setRelayConnected]);
+  }, [adapter, currentId, load, refreshCurrent, setRelayConnected, setPicking]);
 
   return (
     <section className="wb-panel" data-state={state} aria-label="complift drafting bench">

@@ -31,6 +31,7 @@
 
 /* ---- annotation type (11px caps, wide tracking) ---- */
 .wb-sb-name,
+.wb-sb-pick,
 .wb-sb-relay,
 .wb-sb-mcp,
 .wb-sb-ver,
@@ -76,6 +77,27 @@
 .wb-sb-name {
   font-weight: 600;
   letter-spacing: 0.2em;
+}
+.wb-sb-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--ink-3);
+  border-radius: 2px;
+  padding: 2px 8px;
+}
+.wb-sb-pick:hover {
+  border-color: var(--blueprint);
+  color: var(--blueprint);
+}
+.wb-sb-pick.is-on {
+  color: var(--white);
+  background: var(--blueprint);
+  border-color: var(--blueprint);
 }
 .wb-sb-relay {
   display: inline-flex;

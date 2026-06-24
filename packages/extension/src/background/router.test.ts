@@ -46,6 +46,7 @@ function harness() {
     store,
     generate,
     injectPicker: vi.fn(async () => {}),
+    stopPicker: vi.fn(async () => {}),
     injectOverlay: vi.fn(async () => {}),
     hideOverlay: vi.fn(async () => {}),
     relayStatus: vi.fn(() => false),
@@ -197,9 +198,15 @@ describe('createRouter', () => {
       type: 'picker:picked',
       componentId: data.component.id,
     });
+    // A pick ends picking → toggle off.
+    expect(deps.broadcast).toHaveBeenCalledWith({
+      kind: 'complift:event',
+      type: 'picker:state',
+      active: false,
+    });
   });
 
-  it('picker:start 把 tabId 透传给 injectPicker', async () => {
+  it('picker:start 透传 tabId 给 injectPicker 并广播 picker:state active', async () => {
     const { deps, router } = harness();
 
     const res = await router.handle(req('picker:start', { tabId: 42 }));
@@ -207,15 +214,26 @@ describe('createRouter', () => {
     expect(res.ok).toBe(true);
     expect(res.data).toEqual({ ok: true });
     expect(deps.injectPicker).toHaveBeenCalledWith(42);
+    expect(deps.broadcast).toHaveBeenCalledWith({
+      kind: 'complift:event',
+      type: 'picker:state',
+      active: true,
+    });
   });
 
-  it('picker:cancel 返回 ok', async () => {
-    const { router } = harness();
+  it('picker:cancel 调用 stopPicker 并广播 picker:state inactive', async () => {
+    const { deps, router } = harness();
 
     const res = await router.handle(req('picker:cancel', {}));
 
     expect(res.ok).toBe(true);
     expect(res.data).toEqual({ ok: true });
+    expect(deps.stopPicker).toHaveBeenCalledWith(undefined);
+    expect(deps.broadcast).toHaveBeenCalledWith({
+      kind: 'complift:event',
+      type: 'picker:state',
+      active: false,
+    });
   });
 
   it('overlay:show 用 head 版本文件与 sourceSelector 调 injectOverlay', async () => {

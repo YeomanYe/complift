@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { showToast, startPicker, type PickerCallbacks } from './picker-ui';
+import { cancelActivePicker, showToast, startPicker, type PickerCallbacks } from './picker-ui';
 
 const HOST_ID = 'complift-picker-host';
 
@@ -182,6 +182,20 @@ describe('startPicker — 取消与清理', () => {
 
     expect(cb.onCancel).toHaveBeenCalledTimes(1);
     expect(host()).toBeNull();
+  });
+
+  it('cancelActivePicker 静默 dispose 当前 session（不触发 onCancel）', () => {
+    mountTarget();
+    const cb = makeCallbacks();
+    startPicker(document, cb);
+
+    cancelActivePicker();
+
+    // 面板已知正在取消，不应回声 onCancel；host 清理掉。
+    expect(cb.onCancel).not.toHaveBeenCalled();
+    expect(host()).toBeNull();
+    // 无活跃 session 时再调用是安全的 no-op。
+    expect(() => cancelActivePicker()).not.toThrow();
   });
 
   it('dispose 幂等：重复调用不抛错且 host 已移除', () => {

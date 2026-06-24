@@ -210,6 +210,16 @@ export function startPicker(doc: Document, cb: PickerCallbacks): { dispose(): vo
   return session;
 }
 
+/**
+ * Dispose the live picker session WITHOUT firing `onCancel` — used by the
+ * panel-initiated stop path (background → content script), where the panel
+ * already knows picking is ending, so we must not echo a cancel notification
+ * back. No-op when nothing is active.
+ */
+export function cancelActivePicker(): void {
+  activeSession?.dispose();
+}
+
 /** 右上角 toast，2.5s 自动消失；shadow-root 隔离页面样式 */
 export function showToast(doc: Document, message: string, isError = false): void {
   doc.getElementById(TOAST_ID)?.remove();

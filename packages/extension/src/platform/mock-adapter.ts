@@ -175,6 +175,7 @@ export function createMockAdapter(fixtures: MockFixture[] = defaultFixtures()): 
     store,
     generate,
     injectPicker: async () => {},
+    stopPicker: async () => {},
     injectOverlay: async () => {},
     hideOverlay: async () => {},
     relayStatus: () => false,

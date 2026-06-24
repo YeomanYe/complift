@@ -35,6 +35,15 @@ export default defineBackground(() => {
       });
     },
 
+    async stopPicker(tabId) {
+      try {
+        const target = await targetTabId(tabId);
+        await browser.tabs.sendMessage(target, { kind: 'complift:picker-stop' });
+      } catch {
+        // 目标页没有活跃 picker(未注入 / 已结束)时容错,无需处理
+      }
+    },
+
     async injectOverlay(tabId, payload: OverlayPayload) {
       const target = await targetTabId(tabId);
       await browser.scripting.executeScript({
@@ -84,5 +93,11 @@ export default defineBackground(() => {
   browser.action.onClicked.addListener((tab) => {
     if (tab.windowId === undefined) return;
     void browser.sidePanel.open({ windowId: tab.windowId });
+    void router.handle({
+      kind: 'complift:rpc',
+      id: crypto.randomUUID(),
+      method: 'picker:start',
+      params: { tabId: tab.id },
+    });
   });
 });
