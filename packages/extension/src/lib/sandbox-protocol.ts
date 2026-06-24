@@ -77,12 +77,13 @@ export const isRenderSize = (m: unknown): m is RenderSizeMessage => {
  *
  * This is a best-effort heuristic, NOT a hard guarantee. Two paths:
  *
- * 1. Deferred path (production sandbox). The MV3 sandbox is a chrome-extension
- *    sandboxed page in an opaque cross-origin context: reading `contentDocument`
- *    throws a SecurityError, or returns `null` while the frame is still loading.
- *    There is no locally-reachable document to render into yet, so we gate the
- *    first render on the one-shot `load` event (parity with overlay.content.ts)
- *    instead of letting the first render burn the 15s render timeout.
+ * 1. Opaque / not-yet-reachable path (production sandbox). The MV3 sandbox is
+ *    a chrome-extension sandboxed page in an opaque cross-origin context:
+ *    reading `contentDocument` throws a SecurityError, or returns `null` while
+ *    the frame is still loading. The one-shot `load` event may already have
+ *    fired by the time React effects run, so we register the load fallback and
+ *    still attempt one render immediately. If that early message lands on the
+ *    initial about:blank document, the load fallback supersedes it.
  *
  * 2. Reachable path (same-origin / jsdom stub). When `contentDocument` is
  *    readable (no SecurityError, non-null), the frame is same-origin and its
@@ -118,9 +119,11 @@ export function whenIframeReady(iframe: HTMLIFrameElement, cb: () => void): () =
     cb();
     return () => iframe.removeEventListener('load', onLoad);
   }
-  // Opaque cross-origin (throw) or not-yet-navigated (null): wait for `load`.
+  // Opaque cross-origin (throw) or not-yet-navigated (null): keep a `load`
+  // fallback, but also try now in case load already fired before this effect.
   const onLoad = (): void => cb();
   iframe.addEventListener('load', onLoad, { once: true });
+  cb();
   return () => iframe.removeEventListener('load', onLoad);
 }
 

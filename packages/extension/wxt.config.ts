@@ -9,7 +9,7 @@ export default defineConfig({
     sandbox: { pages: ['sandbox.html'] },
     content_security_policy: {
       sandbox:
-        "sandbox allow-scripts allow-same-origin; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; object-src 'self'",
+        "sandbox allow-scripts; script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'; object-src 'self'",
     },
     web_accessible_resources: [
       {

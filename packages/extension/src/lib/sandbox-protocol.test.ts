@@ -325,12 +325,10 @@ describe('whenIframeReady', () => {
     };
   }
 
-  // 设计取舍说明（与实现的诚实注释一致）：whenIframeReady 对“contentDocument 可达
-  // (无 SecurityError、非 null)”一律走同步 cb，因为 jsdom 挂了 src 的 iframe 文档永远停在
-  // readyState='loading' 且永不触发 load——若按 readyState==='complete' 把可达但未完成的
-  // 文档推迟到 load，就会让 Stage/Standalone 的 jsdom 测试死锁。仅“取值抛错(跨域 opaque)”
-  // 与“null(尚未导航)”两种真正不可达的情形才推迟到一次性 load。可达分支额外挂一个一次性
-  // load 监听，以便真实 src 导航完成后用最终文档再渲染一次（早先那次被 sandbox client 顶掉）。
+  // 设计取舍说明：whenIframeReady 不能只等待一次性 load。MV3 sandbox 去掉
+  // allow-same-origin 后是 opaque iframe，React effect 注册监听时 load 可能已经发生；
+  // 如果此时不立即尝试 render，Stage/Standalone 会永久留白。所有分支都会立即尝试一次，
+  // 并为真实 src 导航完成保留一次 load 补渲染；早先那次会被 sandbox client 顶掉。
 
   it('contentDocument 可达且 readyState=complete：cb 同步执行；cleanup 安全且不重复触发', () => {
     const fakeFrame = makeReadyFake({ doc: 'doc' });
@@ -347,31 +345,31 @@ describe('whenIframeReady', () => {
     expect(cb).toHaveBeenCalledTimes(1);
   });
 
-  it('contentDocument 取值抛错（跨域 SecurityError）：cb 不同步执行，load 后触发一次且仅一次', () => {
+  it('contentDocument 取值抛错（跨域 SecurityError）：先同步尝试，load 后补渲染一次', () => {
     const fakeFrame = makeReadyFake({ doc: 'throws' });
     const cb = vi.fn();
     whenIframeReady(fakeFrame.iframe, cb);
 
-    expect(cb).not.toHaveBeenCalled();
+    expect(cb).toHaveBeenCalledTimes(1);
     expect(fakeFrame.addEventListener).toHaveBeenCalledWith('load', expect.any(Function), { once: true });
 
     fakeFrame.fireLoad();
-    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenCalledTimes(2);
 
     // 一次性：再次触发不应重复调用
     fakeFrame.fireLoad();
-    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenCalledTimes(2);
   });
 
-  it('contentDocument === null（尚未导航）：不同步执行，延后到 load 才触发', () => {
+  it('contentDocument === null（尚未导航）：先同步尝试，load 后补渲染一次', () => {
     const fakeFrame = makeReadyFake({ doc: 'null' });
     const cb = vi.fn();
     whenIframeReady(fakeFrame.iframe, cb);
 
-    expect(cb).not.toHaveBeenCalled();
+    expect(cb).toHaveBeenCalledTimes(1);
     expect(fakeFrame.addEventListener).toHaveBeenCalledWith('load', expect.any(Function), { once: true });
     fakeFrame.fireLoad();
-    expect(cb).toHaveBeenCalledTimes(1);
+    expect(cb).toHaveBeenCalledTimes(2);
   });
 
   it('contentDocument 可达但 readyState 非 complete：同步渲染（不死锁），并在 load 后补渲染一次', () => {
@@ -386,16 +384,17 @@ describe('whenIframeReady', () => {
     expect(cb).toHaveBeenCalledTimes(2);
   });
 
-  it('cleanup 在 load 前调用（跨域 deferred 分支）：移除监听，cb 永不触发', () => {
+  it('cleanup 在 load 前调用（跨域分支）：移除补渲染监听，只保留同步尝试', () => {
     const fakeFrame = makeReadyFake({ doc: 'throws' });
     const cb = vi.fn();
     const cleanup = whenIframeReady(fakeFrame.iframe, cb);
 
+    expect(cb).toHaveBeenCalledTimes(1);
     cleanup();
     expect(fakeFrame.removeEventListener).toHaveBeenCalledWith('load', expect.any(Function));
 
     // cleanup 后即使触发 load 也不再调用 cb
     fakeFrame.fireLoad();
-    expect(cb).not.toHaveBeenCalled();
+    expect(cb).toHaveBeenCalledTimes(1);
   });
 });

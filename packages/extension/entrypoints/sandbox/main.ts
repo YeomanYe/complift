@@ -33,10 +33,18 @@ bridge.__compliftReactJsxRuntime = ReactJSXRuntime;
 bridge.__compliftCreateRoot = createRoot;
 
 // Lazily initialize esbuild-wasm once; all renders await the same promise.
+//
+// `worker: false` is REQUIRED in the MV3 sandbox: esbuild-wasm's default mode
+// spins up a Web Worker from a `blob:` URL, which the sandbox CSP
+// (`script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval'`, no `blob:`/`worker-src`)
+// blocks — and esbuild then hangs forever waiting on a worker handshake that
+// never completes (no throw, no reject), so every render stalls and the canvas
+// stays blank. Running on the main thread needs only `unsafe-eval` +
+// `wasm-unsafe-eval`, which the CSP already grants.
 let esbuildReady: Promise<void> | null = null;
 function ensureEsbuild(): Promise<void> {
   if (!esbuildReady) {
-    esbuildReady = esbuild.initialize({ wasmURL: './esbuild.wasm' });
+    esbuildReady = esbuild.initialize({ wasmURL: './esbuild.wasm', worker: false });
   }
   return esbuildReady;
 }
