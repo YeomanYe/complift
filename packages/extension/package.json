@@ -6,6 +6,7 @@
   "scripts": {
     "copy-wasm": "node scripts/copy-esbuild-wasm.mjs",
     "dev": "pnpm run copy-wasm && wxt",
+    "dev:build": "pnpm run copy-wasm && node scripts/watch-build.mjs",
     "build": "pnpm run copy-wasm && wxt build",
     "zip": "pnpm run copy-wasm && wxt zip",
     "postinstall": "node scripts/copy-esbuild-wasm.mjs && wxt prepare",

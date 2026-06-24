@@ -4,6 +4,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "pnpm -r build",
+    "dev": "pnpm --filter extension --filter relay --parallel run dev",
+    "dev:build": "pnpm --filter extension --filter relay --parallel run dev:build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck"
   },
